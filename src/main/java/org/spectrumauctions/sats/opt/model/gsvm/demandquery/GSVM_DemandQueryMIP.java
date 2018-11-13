@@ -81,7 +81,11 @@ public class GSVM_DemandQueryMIP extends ModelMIP implements NonGenericDemandQue
         gsvmMip.getMip().setSolveParam(SolveParam.SOLUTION_POOL_REPLACEMENT, 1);
         gsvmMip.getMip().setSolveParam(SolveParam.SOLUTION_POOL_MODE, 2);
         gsvmMip.getMip().setSolveParam(SolveParam.SOLUTION_POOL_INTENSITY, 4);
-        gsvmMip.getMip().setSolveParam(SolveParam.POPULATE_LIMIT, 100000);
+        gsvmMip.getMip().setSolveParam(SolveParam.POPULATE_LIMIT, 1000);
+        gsvmMip.getMip().setSolveParam(SolveParam.DISPLAY_OUTPUT, true);
+        gsvmMip.getMip().setSolveParam(SolveParam.DATACHECK, 2);
+        gsvmMip.getMip().setSolveParam(SolveParam.PROBLEM_FILE, "case1");
+        gsvmMip.getMip().setSolveParam(SolveParam.THREADS, 1);
         IMIPResult mipResult = solver.solve(gsvmMip.getMip());
         logger.debug("Result:\n{}", mipResult);
 
