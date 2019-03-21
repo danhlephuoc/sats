@@ -31,7 +31,7 @@ import java.util.Map.Entry;
 /**
  * @author Michael Weiss
  */
-public final class BMBidder extends Bidder<BMLicense> implements GenericValueBidder<BMBand> {
+public final class BMBidder extends SATSBidder<BMLicense> implements GenericValueBidder<BMBand> {
 
     private static final Logger logger = LogManager.getLogger(BMBidder.class);
 
@@ -77,7 +77,7 @@ public final class BMBidder extends Bidder<BMLicense> implements GenericValueBid
 
 
     /**
-     * @see Bidder#getValue(Bundle)
+     * @see SATSBidder#getValue(Bundle)
      */
     @Override
     public BigDecimal calculateValue(Bundle<BMLicense> bundle) {
@@ -149,13 +149,13 @@ public final class BMBidder extends Bidder<BMLicense> implements GenericValueBid
     }
 
     @Override
-    public Bidder<BMLicense> drawSimilarBidder(RNGSupplier rngSupplier) {
-        return new BMBidder(getPopulation(), (int) getId(), getWorld(), (BMBidderSetup) getSetup(), rngSupplier.getUniformDistributionRNG());
+    public SATSBidder<BMLicense> drawSimilarBidder(RNGSupplier rngSupplier) {
+        return new BMBidder(getPopulation(), (int) getLongId(), getWorld(), (BMBidderSetup) getSetup(), rngSupplier.getUniformDistributionRNG());
     }
 
 
     /**
-     * @see Bidder#getWorld()
+     * @see SATSBidder#getWorld()
      */
     @Override
     public BMWorld getWorld() {
@@ -208,7 +208,7 @@ public final class BMBidder extends Bidder<BMLicense> implements GenericValueBid
 
 
     /**
-     * @see Bidder#refreshReference(World)
+     * @see SATSBidder#refreshReference(World)
      */
     @Override
     public void refreshReference(World world) {

@@ -9,8 +9,7 @@ import org.spectrumauctions.sats.core.bidlang.generic.GenericDefinition;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericLang;
 import org.spectrumauctions.sats.core.bidlang.xor.XORLanguage;
 import org.spectrumauctions.sats.core.bidlang.xor.XORValue;
-import org.spectrumauctions.sats.core.model.Good;
-import org.spectrumauctions.sats.core.model.bvm.BMLicense;
+import org.spectrumauctions.sats.core.model.SATSGood;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +26,7 @@ public class CatsExporter extends FileWriter {
     }
 
     @Override
-    public File writeSingleBidderXOR(XORLanguage<? extends Good> valueFunction, int numberOfBids, String filePrefix) throws IOException {
+    public File writeSingleBidderXOR(XORLanguage<? extends SATSGood> valueFunction, int numberOfBids, String filePrefix) throws IOException {
         Iterator iter = valueFunction.iterator();
         Set<XORValue<?>> selectedValues = new HashSet<>();
         List<String> bidLines = fileInit(valueFunction);
@@ -51,7 +50,7 @@ public class CatsExporter extends FileWriter {
 
     }
 
-    private List<String> fileInit(XORLanguage<? extends Good> lang) {
+    private List<String> fileInit(XORLanguage<? extends SATSGood> lang) {
         List<String> lines = new ArrayList<>();
 
         String satsversion = null;
@@ -71,7 +70,7 @@ public class CatsExporter extends FileWriter {
     }
 
     @Override
-    public File writeMultiBidderXOR(Collection<XORLanguage<? extends Good>> valueFunctions, int numberOfBids, String filePrefix) throws IOException {
+    public File writeMultiBidderXOR(Collection<XORLanguage<? extends SATSGood>> valueFunctions, int numberOfBids, String filePrefix) throws IOException {
         List<String> lines = fileInit(valueFunctions.iterator().next());
         lines.add("%% This file may contain bids from multiple bidders.");
         lines.add("% Bids from different bidders are separated using dummy items with negative IDs");
@@ -81,7 +80,7 @@ public class CatsExporter extends FileWriter {
         //Dummy items are negative integers, for easier distinction
         int dummyItem = -1;
         int countBids = 0;
-        for (XORLanguage<? extends Good> valueFunction : valueFunctions) {
+        for (XORLanguage<? extends SATSGood> valueFunction : valueFunctions) {
             Iterator iter = valueFunction.iterator();
             for (int i = 0; i < numberOfBids && iter.hasNext(); i++) {
                 XORValue<?> value = (XORValue) iter.next();
@@ -116,7 +115,7 @@ public class CatsExporter extends FileWriter {
      * @see FileWriter#writeMultiBidderXORQ(java.util.Collection, int, java.lang.String)
      */
     @Override
-    public File writeMultiBidderXORQ(Collection<GenericLang<GenericDefinition<? extends Good>, ?>> valueFunctions, int numberOfBids,
+    public File writeMultiBidderXORQ(Collection<GenericLang<GenericDefinition<? extends SATSGood>, ?>> valueFunctions, int numberOfBids,
                                      String filePrefix) throws IOException {
         throw new UnsupportedOperationException("XOR-Q is not compatible with the CATS file format");
     }
@@ -125,7 +124,7 @@ public class CatsExporter extends FileWriter {
      * @see FileWriter#writeSingleBidderXORQ(GenericLang, int, java.lang.String)
      */
     @Override
-    public File writeSingleBidderXORQ(GenericLang<GenericDefinition<? extends Good>, ?> lang, int numberOfBids, String filePrefix)
+    public File writeSingleBidderXORQ(GenericLang<GenericDefinition<? extends SATSGood>, ?> lang, int numberOfBids, String filePrefix)
             throws IOException {
         throw new UnsupportedOperationException("XOR-Q is not compatible with the CATS file format");
     }

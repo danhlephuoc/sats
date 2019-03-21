@@ -1,7 +1,7 @@
 package org.spectrumauctions.sats.core.model.cats;
 
 import com.google.common.collect.ImmutableSet;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.World;
 import org.spectrumauctions.sats.core.model.cats.graphalgorithms.Graph;
 import org.spectrumauctions.sats.core.model.cats.graphalgorithms.Mesh2D;
@@ -60,7 +60,7 @@ public final class CATSWorld extends World {
     }
 
     @Override
-    public Collection<? extends Bidder<CATSLicense>> restorePopulation(long populationId) {
+    public Collection<? extends SATSBidder<CATSLicense>> restorePopulation(long populationId) {
         return super.restorePopulation(CATSBidder.class, populationId);
     }
 

@@ -1,5 +1,6 @@
 package org.spectrumauctions.sats.opt.model.lsvm;
 
+import ch.uzh.ifi.ce.domain.Bidder;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import edu.harvard.econcs.jopt.solver.IMIPResult;
@@ -9,15 +10,15 @@ import edu.harvard.econcs.jopt.solver.mip.CompareType;
 import edu.harvard.econcs.jopt.solver.mip.Constraint;
 import edu.harvard.econcs.jopt.solver.mip.VarType;
 import edu.harvard.econcs.jopt.solver.mip.Variable;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.Bundle;
 import org.spectrumauctions.sats.core.model.cats.graphalgorithms.Vertex;
 import org.spectrumauctions.sats.core.model.lsvm.LSVMBidder;
 import org.spectrumauctions.sats.core.model.lsvm.LSVMGrid;
 import org.spectrumauctions.sats.core.model.lsvm.LSVMLicense;
 import org.spectrumauctions.sats.core.model.lsvm.LSVMWorld;
-import org.spectrumauctions.sats.opt.domain.ItemAllocation;
-import org.spectrumauctions.sats.opt.domain.ItemAllocation.ItemAllocationBuilder;
+import org.spectrumauctions.sats.opt.domain.ItemSATSAllocation;
+import org.spectrumauctions.sats.opt.domain.ItemSATSAllocation.ItemAllocationBuilder;
 import org.spectrumauctions.sats.opt.domain.WinnerDeterminator;
 import org.spectrumauctions.sats.opt.model.ModelMIP;
 
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
  *
  * @author Nicolas Küchler
  */
-public class LSVMStandardMIP extends ModelMIP implements WinnerDeterminator<LSVMLicense> {
+public class LSVMStandardMIP extends ModelMIP {
 
 	private Map<LSVMBidder, Map<LSVMLicense, Double>> valueMap;
 
@@ -53,8 +54,8 @@ public class LSVMStandardMIP extends ModelMIP implements WinnerDeterminator<LSVM
 		this.population = population;
 
 		// init MIP
-		getMip().setObjectiveMax(true);
-		getMip().setSolveParam(SolveParam.TIME_LIMIT, 3600.0);
+		getMIP().setObjectiveMax(true);
+		getMIP().setSolveParam(SolveParam.TIME_LIMIT, 3600.0);
 
 		initBaseValues();
 		initA();
@@ -70,17 +71,18 @@ public class LSVMStandardMIP extends ModelMIP implements WinnerDeterminator<LSVM
 	}
 
 	@Override
-	public WinnerDeterminator<LSVMLicense> getWdWithoutBidder(Bidder bidder) {
-        Preconditions.checkArgument(population.contains(bidder));
-		return new LSVMStandardMIP(population.stream().filter(b -> !b.equals(bidder)).collect(Collectors.toList()));
+	public ModelMIP getMIPWithout(Bidder bidder) {
+		LSVMBidder lsvmBidder = (LSVMBidder) bidder;
+        Preconditions.checkArgument(population.contains(lsvmBidder));
+		return new LSVMStandardMIP(population.stream().filter(b -> !b.equals(lsvmBidder)).collect(Collectors.toList()));
 	}
 
 	@Override
-	public ItemAllocation<LSVMLicense> calculateAllocation() {
+	public ItemSATSAllocation<LSVMLicense> calculateAllocation() {
 		SolverClient solver = new SolverClient();
-		IMIPResult result = solver.solve(getMip());
+		IMIPResult result = solver.solve(getMIP());
 
-		Map<Bidder<LSVMLicense>, Bundle<LSVMLicense>> allocation = new HashMap<>();
+		Map<SATSBidder<LSVMLicense>, Bundle<LSVMLicense>> allocation = new HashMap<>();
 		for (LSVMBidder bidder : population) {
 			Bundle<LSVMLicense> bundle = new Bundle<>();
             for (LSVMLicense license : world.getLicenses()) {
@@ -113,13 +115,8 @@ public class LSVMStandardMIP extends ModelMIP implements WinnerDeterminator<LSVM
     }
 
 	@Override
-	public WinnerDeterminator<LSVMLicense> copyOf() {
+	public ModelMIP copyOf() {
 		return new LSVMStandardMIP(population);
-	}
-
-	@Override
-	public void adjustPayoffs(Map<Bidder<LSVMLicense>, Double> payoffs) {
-        throw new UnsupportedOperationException("The LSVM MIP does not support CCG yet.");
 	}
 
 	private void buildObjectiveTerm() {
@@ -127,7 +124,7 @@ public class LSVMStandardMIP extends ModelMIP implements WinnerDeterminator<LSVM
             for (LSVMLicense license : world.getLicenses()) {
                 for (int tau = 0; tau < world.getLicenses().size(); tau++) {
                     double value = calculateComplementarityMarkup(tau + 1, bidder) * valueMap.get(bidder).get(license);
-                    getMip().addObjectiveTerm(value, aVariables.get(bidder).get(license).get(tau));
+                    getMIP().addObjectiveTerm(value, aVariables.get(bidder).get(license).get(tau));
                 }
             }
 		}
@@ -141,7 +138,7 @@ public class LSVMStandardMIP extends ModelMIP implements WinnerDeterminator<LSVM
                     constraint.addTerm(1, aVariables.get(bidder).get(license).get(tau));
                 }
 			}
-			getMip().add(constraint);
+			getMIP().add(constraint);
 		}
 	}
 
@@ -155,7 +152,7 @@ public class LSVMStandardMIP extends ModelMIP implements WinnerDeterminator<LSVM
                     }
                 }
 			}
-			getMip().add(constraint);
+			getMIP().add(constraint);
 		}
 	}
 
@@ -176,7 +173,7 @@ public class LSVMStandardMIP extends ModelMIP implements WinnerDeterminator<LSVM
                                 }
                             }
                         }
-                        getMip().add(constraint);
+                        getMIP().add(constraint);
                     }
                 }
             }
@@ -198,7 +195,7 @@ public class LSVMStandardMIP extends ModelMIP implements WinnerDeterminator<LSVM
                         constraint.addTerm(1, aVariables.get(bidder).get(license).get(tau));
                     }
                 }
-                getMip().add(constraint);
+                getMIP().add(constraint);
             }
 		}
 	}
@@ -221,7 +218,7 @@ public class LSVMStandardMIP extends ModelMIP implements WinnerDeterminator<LSVM
                         }
                     }
                 }
-                getMip().add(constraint);
+                getMIP().add(constraint);
             }
         }
 	}
@@ -231,7 +228,7 @@ public class LSVMStandardMIP extends ModelMIP implements WinnerDeterminator<LSVM
 		for (LSVMBidder bidder : population) {
 		    valueMap.put(bidder, new HashMap<>());
             for (LSVMLicense license : world.getLicenses()) {
-                valueMap.get(bidder).put(license, bidder.getBaseValues().getOrDefault(license.getId(), BigDecimal.ZERO).doubleValue());
+                valueMap.get(bidder).put(license, bidder.getBaseValues().getOrDefault(license.getLongId(), BigDecimal.ZERO).doubleValue());
             }
 		}
 	}
@@ -243,8 +240,8 @@ public class LSVMStandardMIP extends ModelMIP implements WinnerDeterminator<LSVM
             for (LSVMLicense license : world.getLicenses()) {
                 aVariables.get(bidder).put(license, new HashMap<>());
                 for (int tau = 0; tau < world.getLicenses().size(); tau++) {
-                    Variable var = new Variable(String.format("A_i[%d]j[%d]tau[%d]", (int) bidder.getId(), (int) license.getId(), tau), VarType.BOOLEAN, 0, 1);
-                    getMip().add(var);
+                    Variable var = new Variable(String.format("A_i[%d]j[%d]tau[%d]", (int) bidder.getLongId(), (int) license.getLongId(), tau), VarType.BOOLEAN, 0, 1);
+                    getMIP().add(var);
                     aVariables.get(bidder).get(license).put(tau, var);
                 }
             }
@@ -288,8 +285,8 @@ public class LSVMStandardMIP extends ModelMIP implements WinnerDeterminator<LSVM
                 eVariables.get(bidder).put(entry.getKey(), new HashMap<>());
                 for (int c = 0; c < world.getLicenses().size(); c++) {
                     if (entry.getValue().contains(c + 1)) {
-                        Variable var = new Variable(String.format("E_i[%d]e[%s]c[%d]", (int) bidder.getId(), entry.getKey(), c), VarType.BOOLEAN, 0, 1);
-                        getMip().add(var);
+                        Variable var = new Variable(String.format("E_i[%d]e[%s]c[%d]", (int) bidder.getLongId(), entry.getKey(), c), VarType.BOOLEAN, 0, 1);
+                        getMIP().add(var);
                         eVariables.get(bidder).get(entry.getKey()).put(c, var);
                     }
                 }
@@ -351,7 +348,7 @@ public class LSVMStandardMIP extends ModelMIP implements WinnerDeterminator<LSVM
 		LSVMLicense l2;
 
 		public Edge(LSVMLicense l1, LSVMLicense l2) {
-		    if (l1.getId() > l2.getId()) {
+		    if (l1.getLongId() > l2.getLongId()) {
                 this.l1 = l1;
                 this.l2 = l2;
             } else {
@@ -362,7 +359,7 @@ public class LSVMStandardMIP extends ModelMIP implements WinnerDeterminator<LSVM
 
         @Override
         public String toString() {
-            return "Edge(" + (int) l1.getId() + "," + (int) l2.getId() + ")";
+            return "Edge(" + (int) l1.getLongId() + "," + (int) l2.getLongId() + ")";
         }
 
         @Override

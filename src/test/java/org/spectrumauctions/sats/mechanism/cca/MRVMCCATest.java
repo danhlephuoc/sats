@@ -7,7 +7,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericBid;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValue;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.mrvm.*;
 import org.spectrumauctions.sats.mechanism.PaymentRuleEnum;
 import org.spectrumauctions.sats.mechanism.cca.priceupdate.DemandDependentGenericPriceUpdate;
@@ -15,7 +15,7 @@ import org.spectrumauctions.sats.mechanism.cca.priceupdate.SimpleRelativeGeneric
 import org.spectrumauctions.sats.mechanism.cca.supplementaryround.LastBidsTrueValueGenericSupplementaryRound;
 import org.spectrumauctions.sats.mechanism.cca.supplementaryround.ProfitMaximizingGenericSupplementaryRound;
 import org.spectrumauctions.sats.mechanism.domain.MechanismResult;
-import org.spectrumauctions.sats.opt.domain.Allocation;
+import org.spectrumauctions.sats.opt.domain.SATSAllocation;
 import org.spectrumauctions.sats.opt.model.mrvm.MRVMMipResult;
 import org.spectrumauctions.sats.opt.model.mrvm.MRVM_MIP;
 import org.spectrumauctions.sats.opt.model.mrvm.demandquery.MRVM_DemandQueryMIPBuilder;
@@ -49,19 +49,19 @@ public class MRVMCCATest {
         MRVM_MIP mip = new MRVM_MIP(Sets.newHashSet(rawBidders));
         mip.setEpsilon(1e-5);
         MRVMMipResult efficientAllocation = mip.calculateAllocation();
-        Allocation<MRVMLicense> efficientAllocationWithTrueValues = efficientAllocation.getAllocationWithTrueValues();
+        SATSAllocation<MRVMLicense> efficientAllocationWithTrueValues = efficientAllocation.getAllocationWithTrueValues();
         double diff = efficientAllocation.getTotalValue().doubleValue() - efficientAllocationWithTrueValues.getTotalValue().doubleValue();
         //assertTrue(diff > -1e-6 && diff < 1e-6);
 
         long start = System.currentTimeMillis();
         GenericCCAMechanism<MRVMGenericDefinition, MRVMLicense> cca = getMechanism(rawBidders);
 
-        Allocation<MRVMLicense> allocationAfterClockPhase = cca.calculateClockPhaseAllocation();
-        Allocation<MRVMLicense> allocCP = allocationAfterClockPhase.getAllocationWithTrueValues();
+        SATSAllocation<MRVMLicense> allocationAfterClockPhase = cca.calculateClockPhaseAllocation();
+        SATSAllocation<MRVMLicense> allocCP = allocationAfterClockPhase.getAllocationWithTrueValues();
         assertNotEquals(allocationAfterClockPhase, allocCP);
 
-        Allocation<MRVMLicense> allocationAfterSupplementaryRound = cca.calculateAllocationAfterSupplementaryRound();
-        Allocation<MRVMLicense> allocSR = allocationAfterSupplementaryRound.getAllocationWithTrueValues();
+        SATSAllocation<MRVMLicense> allocationAfterSupplementaryRound = cca.calculateAllocationAfterSupplementaryRound();
+        SATSAllocation<MRVMLicense> allocSR = allocationAfterSupplementaryRound.getAllocationWithTrueValues();
         assertNotEquals(allocationAfterSupplementaryRound, allocSR);
         long end = System.currentTimeMillis();
 
@@ -83,8 +83,8 @@ public class MRVMCCATest {
     }
 
     private GenericCCAMechanism<MRVMGenericDefinition, MRVMLicense> getMechanism(List<MRVMBidder> rawBidders) {
-        List<Bidder<MRVMLicense>> bidders = rawBidders.stream()
-                .map(b -> (Bidder<MRVMLicense>) b).collect(Collectors.toList());
+        List<SATSBidder<MRVMLicense>> bidders = rawBidders.stream()
+                .map(b -> (SATSBidder<MRVMLicense>) b).collect(Collectors.toList());
         GenericCCAMechanism<MRVMGenericDefinition, MRVMLicense> cca = new GenericCCAMechanism<>(bidders, new MRVM_DemandQueryMIPBuilder());
         cca.setFallbackStartingPrice(BigDecimal.ZERO);
         cca.setEpsilon(1e-5);
@@ -103,8 +103,8 @@ public class MRVMCCATest {
 
     // This method simply shows what settings can be changed
     private GenericCCAMechanism<MRVMGenericDefinition, MRVMLicense> getCustomMechanism(List<MRVMBidder> rawBidders) {
-        List<Bidder<MRVMLicense>> bidders = rawBidders.stream()
-                .map(b -> (Bidder<MRVMLicense>) b).collect(Collectors.toList());
+        List<SATSBidder<MRVMLicense>> bidders = rawBidders.stream()
+                .map(b -> (SATSBidder<MRVMLicense>) b).collect(Collectors.toList());
         GenericCCAMechanism<MRVMGenericDefinition, MRVMLicense> cca = new GenericCCAMechanism<>(bidders, new MRVM_DemandQueryMIPBuilder());
         cca.setFallbackStartingPrice(BigDecimal.ZERO);
         cca.setEpsilon(1e-5);
@@ -138,7 +138,7 @@ public class MRVMCCATest {
         supplementaryRoundLastPrices.useLastDemandedPrices(true);
         cca.addSupplementaryRound(supplementaryRoundLastPrices);
 
-        Allocation<MRVMLicense> allocationAfterSupplementaryRound = cca.calculateAllocationAfterSupplementaryRound();
+        SATSAllocation<MRVMLicense> allocationAfterSupplementaryRound = cca.calculateAllocationAfterSupplementaryRound();
         rawBidders.forEach(b -> assertEquals(cca.getBidCountAfterSupplementaryRound().get(b) - cca.getBidCountAfterClockPhase().get(b), 650));
     }
 
@@ -147,14 +147,14 @@ public class MRVMCCATest {
         List<MRVMBidder> rawBidders = new MultiRegionModel().createNewPopulation();
         GenericCCAMechanism<MRVMGenericDefinition, MRVMLicense> ccaZero = getMechanism(rawBidders);
         long startZero = System.currentTimeMillis();
-        Allocation<MRVMLicense> allocZero = ccaZero.calculateClockPhaseAllocation();
+        SATSAllocation<MRVMLicense> allocZero = ccaZero.calculateClockPhaseAllocation();
         BigDecimal zeroTotalValue = allocZero.getAllocationWithTrueValues().getTotalValue();
         long durationZero = System.currentTimeMillis() - startZero;
 
         GenericCCAMechanism<MRVMGenericDefinition, MRVMLicense> ccaSampled = getMechanism(rawBidders);
         ccaSampled.calculateSampledStartingPrices(10, 100, 0.1);
         long startSampled = System.currentTimeMillis();
-        Allocation<MRVMLicense> allocSampled = ccaSampled.calculateClockPhaseAllocation();
+        SATSAllocation<MRVMLicense> allocSampled = ccaSampled.calculateClockPhaseAllocation();
         BigDecimal sampledTotalValue = allocSampled.getAllocationWithTrueValues().getTotalValue();
         long durationSampled = System.currentTimeMillis() - startSampled;
 
@@ -165,8 +165,8 @@ public class MRVMCCATest {
     @Test
     public void testLastBidsSupplementaryRound() {
         List<MRVMBidder> rawBidders = new MultiRegionModel().createNewPopulation();
-        List<Bidder<MRVMLicense>> bidders = rawBidders.stream()
-                .map(b -> (Bidder<MRVMLicense>) b).collect(Collectors.toList());
+        List<SATSBidder<MRVMLicense>> bidders = rawBidders.stream()
+                .map(b -> (SATSBidder<MRVMLicense>) b).collect(Collectors.toList());
         GenericCCAMechanism<MRVMGenericDefinition, MRVMLicense> cca = new GenericCCAMechanism<>(bidders, new MRVM_DemandQueryMIPBuilder());
         cca.setFallbackStartingPrice(BigDecimal.ZERO);
         cca.setEpsilon(1e-5);
@@ -179,7 +179,7 @@ public class MRVMCCATest {
         lastBidsSupplementaryRound.setNumberOfSupplementaryBids(10);
         cca.addSupplementaryRound(lastBidsSupplementaryRound);
 
-        Allocation<MRVMLicense> allocationAfterSupplementaryRound = cca.calculateAllocationAfterSupplementaryRound();
+        SATSAllocation<MRVMLicense> allocationAfterSupplementaryRound = cca.calculateAllocationAfterSupplementaryRound();
         for (MRVMBidder bidder : rawBidders) {
             GenericBid<MRVMGenericDefinition, MRVMLicense> bid = cca.getBidAfterSupplementaryRound(bidder);
             int maxBids = Math.min(10, bid.getValues().size() / 2);

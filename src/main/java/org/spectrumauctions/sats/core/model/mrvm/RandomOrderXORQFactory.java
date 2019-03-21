@@ -3,7 +3,7 @@ package org.spectrumauctions.sats.core.model.mrvm;
 import org.spectrumauctions.sats.core.bidlang.generic.FlatSizeIterators.GenericSizeOrdered;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValueBidder;
 import org.spectrumauctions.sats.core.bidlang.generic.SimpleRandomOrder.XORQRandomOrderSimple;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.UnsupportedBiddingLanguageException;
 import org.spectrumauctions.sats.core.util.random.JavaUtilRNGSupplier;
 import org.spectrumauctions.sats.core.util.random.RNGSupplier;
@@ -60,7 +60,7 @@ public class RandomOrderXORQFactory implements Serializable {
         }
 
         @Override
-        public Bidder<MRVMLicense> getBidder() {
+        public SATSBidder<MRVMLicense> getBidder() {
             return bidder;
         }
 

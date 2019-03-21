@@ -12,11 +12,10 @@ import org.spectrumauctions.sats.core.bidlang.generic.SizeOrderedPowerset.Generi
 import org.spectrumauctions.sats.core.bidlang.xor.DecreasingSizeOrderedXOR;
 import org.spectrumauctions.sats.core.bidlang.xor.IncreasingSizeOrderedXOR;
 import org.spectrumauctions.sats.core.bidlang.xor.SizeBasedUniqueRandomXOR;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.Bundle;
 import org.spectrumauctions.sats.core.model.UnsupportedBiddingLanguageException;
 import org.spectrumauctions.sats.core.model.World;
-import org.spectrumauctions.sats.core.util.random.JavaUtilRNGSupplier;
 import org.spectrumauctions.sats.core.util.random.RNGSupplier;
 
 import java.math.BigDecimal;
@@ -30,7 +29,7 @@ import java.util.Map.Entry;
 /**
  * @author Michael Weiss
  */
-public final class SRVMBidder extends Bidder<SRVMLicense> implements GenericValueBidder<SRVMBand> {
+public final class SRVMBidder extends SATSBidder<SRVMLicense> implements GenericValueBidder<SRVMBand> {
 
     private static final int CALCSCALE = 5;
     private static final long serialVersionUID = -4577743658098455267L;
@@ -78,7 +77,7 @@ public final class SRVMBidder extends Bidder<SRVMLicense> implements GenericValu
     }
 
     /* (non-Javadoc)
-     * @see Bidder#getWorld()
+     * @see SATSBidder#getWorld()
      */
     @Override
     public SRVMWorld getWorld() {
@@ -184,8 +183,8 @@ public final class SRVMBidder extends Bidder<SRVMLicense> implements GenericValu
     }
 
     @Override
-    public Bidder<SRVMLicense> drawSimilarBidder(RNGSupplier rngSupplier) {
-        return new SRVMBidder((SRVMBidderSetup) getSetup(), getWorld(), getId(), getPopulation(), rngSupplier);
+    public SATSBidder<SRVMLicense> drawSimilarBidder(RNGSupplier rngSupplier) {
+        return new SRVMBidder((SRVMBidderSetup) getSetup(), getWorld(), getLongId(), getPopulation(), rngSupplier);
     }
 
     @Override
@@ -221,7 +220,7 @@ public final class SRVMBidder extends Bidder<SRVMLicense> implements GenericValu
     }
 
     /**
-     * @see Bidder#refreshReference(World)
+     * @see SATSBidder#refreshReference(World)
      */
     @Override
     public void refreshReference(World world) {

@@ -3,7 +3,7 @@ package org.spectrumauctions.sats.opt.model.mrvm.demandquery;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValue;
 import org.spectrumauctions.sats.core.model.mrvm.*;
 import org.spectrumauctions.sats.opt.domain.GenericDemandQueryResult;
-import org.spectrumauctions.sats.opt.domain.GenericAllocation;
+import org.spectrumauctions.sats.opt.domain.GenericSATSAllocation;
 
 import java.math.BigDecimal;
 
@@ -34,7 +34,7 @@ public final class MRVMDemandQueryMipResult implements GenericDemandQueryResult<
     }
 
 
-    public static final class Builder extends GenericAllocation.Builder<MRVMGenericDefinition, MRVMLicense> {
+    public static final class Builder extends GenericSATSAllocation.Builder<MRVMGenericDefinition, MRVMLicense> {
 
         private MRVMWorld world;
         private double totalUtility;

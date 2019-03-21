@@ -10,12 +10,12 @@ import edu.harvard.econcs.jopt.solver.client.SolverClient;
 import edu.harvard.econcs.jopt.solver.mip.*;
 import org.spectrumauctions.sats.core.bidlang.xor.XORBid;
 import org.spectrumauctions.sats.core.bidlang.xor.XORValue;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.Bundle;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSGood;
 import org.spectrumauctions.sats.core.model.World;
-import org.spectrumauctions.sats.opt.domain.Allocation;
-import org.spectrumauctions.sats.opt.domain.ItemAllocation;
+import org.spectrumauctions.sats.opt.domain.SATSAllocation;
+import org.spectrumauctions.sats.opt.domain.ItemSATSAllocation;
 import org.spectrumauctions.sats.opt.domain.WinnerDeterminator;
 
 import java.math.BigDecimal;
@@ -32,11 +32,11 @@ import static edu.harvard.econcs.jopt.solver.mip.MIP.MAX_VALUE;
  *
  * @author Benedikt Buenz
  */
-public class XORWinnerDetermination<T extends Good> implements WinnerDeterminator<T> {
+public class XORWinnerDetermination<T extends SATSGood> implements WinnerDeterminator<T> {
     private Map<XORValue<T>, Variable> bidVariables = new HashMap<>();
     private Collection<XORBid<T>> bids;
     private IMIP winnerDeterminationProgram;
-    private Allocation<T> result = null;
+    private SATSAllocation<T> result = null;
     private World world;
     private double scalingFactor = 1;
 
@@ -72,13 +72,13 @@ public class XORWinnerDetermination<T extends Good> implements WinnerDeterminato
                 bidVariables.put(bundleBid, bidI);
             }
         }
-        Map<Good, Constraint> goods = new HashMap<>();
+        Map<SATSGood, Constraint> goods = new HashMap<>();
 
         for (XORBid<T> xorBid : bids) {
             Constraint exclusiveBids = new Constraint(CompareType.LEQ, 1);
             for (XORValue<T> bundleBid : xorBid.getValues()) {
                 exclusiveBids.addTerm(1, bidVariables.get(bundleBid));
-                for (Good good : bundleBid.getLicenses()) {
+                for (SATSGood good : bundleBid.getLicenses()) {
                     Constraint noDoubleAssignment = goods.get(good);
                     if (noDoubleAssignment == null) {
                         noDoubleAssignment = new Constraint(CompareType.LEQ, 1);
@@ -105,12 +105,12 @@ public class XORWinnerDetermination<T extends Good> implements WinnerDeterminato
     }
 
     @Override
-    public WinnerDeterminator<T> getWdWithoutBidder(Bidder bidder) {
+    public WinnerDeterminator<T> getWdWithoutBidder(SATSBidder bidder) {
         return new XORWinnerDetermination<>(bids.stream().filter(b -> !b.getBidder().equals(bidder)).collect(Collectors.toSet()));
     }
 
     @Override
-    public Allocation<T> calculateAllocation() {
+    public SATSAllocation<T> calculateAllocation() {
         if (result == null) {
             result = solveWinnerDetermination();
         }
@@ -123,9 +123,9 @@ public class XORWinnerDetermination<T extends Good> implements WinnerDeterminato
     }
 
     @Override
-    public void adjustPayoffs(Map<Bidder<T>, Double> payoffs) {
+    public void adjustPayoffs(Map<SATSBidder<T>, Double> payoffs) {
         for (XORBid<T> bidPerBidder : bids) {
-            Variable x = new Variable("x_" + bidPerBidder.getBidder().getId(), VarType.BOOLEAN, 0, 1);
+            Variable x = new Variable("x_" + bidPerBidder.getBidder().getLongId(), VarType.BOOLEAN, 0, 1);
             winnerDeterminationProgram.add(x);
             winnerDeterminationProgram.addObjectiveTerm(-payoffs.getOrDefault(bidPerBidder.getBidder(), 0.0), x);
 
@@ -140,16 +140,16 @@ public class XORWinnerDetermination<T extends Good> implements WinnerDeterminato
         }
     }
 
-    private Allocation<T> solveWinnerDetermination() {
+    private SATSAllocation<T> solveWinnerDetermination() {
         IMIPSolver solver = new SolverClient();
         IMIPResult mipResult = solver.solve(getMIP());
         return adaptMIPResult(mipResult);
     }
 
-    private Allocation<T> adaptMIPResult(IMIPResult mipResult) {
+    private SATSAllocation<T> adaptMIPResult(IMIPResult mipResult) {
 
-        Map<Bidder<T>, Bundle<T>> trades = new HashMap<>();
-        Map<Bidder<T>, BigDecimal> declaredValues = new HashMap<>();
+        Map<SATSBidder<T>, Bundle<T>> trades = new HashMap<>();
+        Map<SATSBidder<T>, BigDecimal> declaredValues = new HashMap<>();
         double totalValue = 0;
         for (XORBid<T> xorBid : bids) {
             double bidValue = 0;
@@ -168,7 +168,7 @@ public class XORWinnerDetermination<T extends Good> implements WinnerDeterminato
             }
         }
 
-        ItemAllocation.ItemAllocationBuilder<T> builder = new ItemAllocation.ItemAllocationBuilder<>();
+        ItemSATSAllocation.ItemAllocationBuilder<T> builder = new ItemSATSAllocation.ItemAllocationBuilder<>();
         return builder
                 .withAllocation(trades)
                 .withTotalValue(BigDecimal.valueOf(totalValue))

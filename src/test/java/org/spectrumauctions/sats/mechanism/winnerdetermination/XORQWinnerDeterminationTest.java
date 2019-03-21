@@ -1,6 +1,6 @@
 package org.spectrumauctions.sats.mechanism.winnerdetermination;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericBid;
@@ -8,7 +8,7 @@ import org.spectrumauctions.sats.core.bidlang.generic.GenericDefinition;
 import org.spectrumauctions.sats.mechanism.MockWorld;
 import org.spectrumauctions.sats.mechanism.MockWorld.MockBand;
 import org.spectrumauctions.sats.mechanism.MockWorld.MockGood;
-import org.spectrumauctions.sats.opt.domain.Allocation;
+import org.spectrumauctions.sats.opt.domain.SATSAllocation;
 import org.spectrumauctions.sats.opt.domain.WinnerDeterminator;
 import org.spectrumauctions.sats.opt.xorq.XORQWinnerDetermination;
 
@@ -37,12 +37,12 @@ public class XORQWinnerDeterminationTest {
     public void setUp() {
         A = MockWorld.getInstance().createNewGood();
         B = MockWorld.getInstance().createNewGood();
-        B0 = MockWorld.getInstance().createNewBand(Sets.newHashSet(A, B));
+        B0 = MockWorld.getInstance().createNewBand(Lists.newArrayList(A, B));
         C = MockWorld.getInstance().createNewGood();
         D = MockWorld.getInstance().createNewGood();
-        B1 = MockWorld.getInstance().createNewBand(Sets.newHashSet(C, D));
+        B1 = MockWorld.getInstance().createNewBand(Lists.newArrayList(C, D));
         E = MockWorld.getInstance().createNewGood();
-        B2 = MockWorld.getInstance().createNewBand(Sets.newHashSet(E));
+        B2 = MockWorld.getInstance().createNewBand(Lists.newArrayList(E));
         bidders = new HashMap<>();
         MockWorld.getInstance().reset();
     }
@@ -52,7 +52,7 @@ public class XORQWinnerDeterminationTest {
         MockWorld.MockBidder fromMap = bidders.get(id);
         if (fromMap == null) {
             MockWorld.MockBidder bidder = MockWorld.getInstance().createNewBidder();
-            bidders.put((int) bidder.getId(), bidder);
+            bidders.put((int) bidder.getLongId(), bidder);
             return bidder(id);
         }
         return fromMap;
@@ -81,13 +81,13 @@ public class XORQWinnerDeterminationTest {
         bidder(4).addGenericBid(bid4, 4);
 
         Set<GenericBid<GenericDefinition<MockGood>, MockGood>> bids = new HashSet<>();
-        bids.add(new GenericBid<>(bidder(1), bidder(1).getGenericBids()));
-        bids.add(new GenericBid<>(bidder(2), bidder(2).getGenericBids()));
-        bids.add(new GenericBid<>(bidder(3), bidder(3).getGenericBids()));
-        bids.add(new GenericBid<>(bidder(4), bidder(4).getGenericBids()));
+        //bids.add(new GenericBid<>(bidder(1), bidder(1).getGenericBids()));
+        //bids.add(new GenericBid<>(bidder(2), bidder(2).getGenericBids()));
+        //bids.add(new GenericBid<>(bidder(3), bidder(3).getGenericBids()));
+        //bids.add(new GenericBid<>(bidder(4), bidder(4).getGenericBids()));
 
         WinnerDeterminator<MockGood> wd = new XORQWinnerDetermination<>(bids);
-        Allocation<MockGood> result = wd.calculateAllocation();
+        SATSAllocation<MockGood> result = wd.calculateAllocation();
         assertEquals(5, result.getTotalValue().doubleValue(), 1e-6);
         assertEquals(1, result.getTradeValue(bidder(1)).doubleValue(), 1e-6);
         assertEquals(3, result.getTradeValue(bidder(2)).doubleValue(), 1e-6);

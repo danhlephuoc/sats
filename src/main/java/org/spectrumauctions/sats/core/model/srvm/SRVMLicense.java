@@ -6,9 +6,9 @@
 package org.spectrumauctions.sats.core.model.srvm;
 
 import com.google.common.base.Preconditions;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSGood;
 
-public final class SRVMLicense extends Good {
+public final class SRVMLicense extends SATSGood {
 
     private static final long serialVersionUID = 7672703280459172931L;
 
@@ -27,7 +27,7 @@ public final class SRVMLicense extends Good {
 
 
     /**
-     * @see Good#getWorld()
+     * @see SATSGood#getWorld()
      */
     @Override
     public SRVMWorld getWorld() {

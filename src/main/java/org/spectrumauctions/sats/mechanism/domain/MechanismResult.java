@@ -1,17 +1,17 @@
 package org.spectrumauctions.sats.mechanism.domain;
 
-import org.spectrumauctions.sats.core.model.Good;
-import org.spectrumauctions.sats.opt.domain.Allocation;
+import org.spectrumauctions.sats.core.model.SATSGood;
+import org.spectrumauctions.sats.opt.domain.SATSAllocation;
 
 /**
  * This class represents the result of an Auction, consisting of
- * an Allocation and a Payment vector.
+ * an SATSAllocation and a Payment vector.
  */
-public class MechanismResult<T extends Good> {
+public class MechanismResult<T extends SATSGood> {
     private final Payment<T> payment;
-    private final Allocation<T> allocation;
+    private final SATSAllocation<T> allocation;
 
-    public MechanismResult(Payment<T> payment, Allocation<T> allocation) {
+    public MechanismResult(Payment<T> payment, SATSAllocation<T> allocation) {
         this.payment = payment;
         this.allocation = allocation;
     }
@@ -20,7 +20,7 @@ public class MechanismResult<T extends Good> {
         return payment;
     }
 
-    public Allocation<T> getAllocation() {
+    public SATSAllocation<T> getAllocation() {
         return allocation;
     }
 

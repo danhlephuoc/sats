@@ -1,14 +1,14 @@
 package org.spectrumauctions.sats.mechanism.cca.priceupdate;
 
 import org.spectrumauctions.sats.core.bidlang.generic.GenericDefinition;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSGood;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DemandDependentGenericPriceUpdate<G extends GenericDefinition<T>, T extends Good> implements GenericPriceUpdater<G, T> {
+public class DemandDependentGenericPriceUpdate<G extends GenericDefinition<T>, T extends SATSGood> implements GenericPriceUpdater<G, T> {
 
     private static final BigDecimal DEFAULT_CONSTANT = BigDecimal.valueOf(1e6);
 

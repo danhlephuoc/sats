@@ -3,21 +3,21 @@ package org.spectrumauctions.sats.mechanism.ccg;
 import edu.harvard.econcs.jopt.solver.IMIPResult;
 import edu.harvard.econcs.jopt.solver.client.SolverClient;
 import edu.harvard.econcs.jopt.solver.mip.*;
-import org.spectrumauctions.sats.core.model.Bidder;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSBidder;
+import org.spectrumauctions.sats.core.model.SATSGood;
 import org.spectrumauctions.sats.mechanism.domain.BidderPayment;
 import org.spectrumauctions.sats.mechanism.domain.MechanismResult;
 import org.spectrumauctions.sats.mechanism.domain.Payment;
 import org.spectrumauctions.sats.mechanism.domain.mechanisms.AuctionMechanism;
 import org.spectrumauctions.sats.mechanism.vcg.VCGMechanism;
-import org.spectrumauctions.sats.opt.domain.Allocation;
+import org.spectrumauctions.sats.opt.domain.SATSAllocation;
 import org.spectrumauctions.sats.opt.domain.WinnerDeterminator;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CCGMechanism<T extends Good> implements AuctionMechanism<T> {
+public class CCGMechanism<T extends SATSGood> implements AuctionMechanism<T> {
 
     private WinnerDeterminator<T> baseWD;
     private MechanismResult<T> result;
@@ -45,12 +45,12 @@ public class CCGMechanism<T extends Good> implements AuctionMechanism<T> {
     }
 
     @Override
-    public WinnerDeterminator<T> getWdWithoutBidder(Bidder<T> bidder) {
+    public WinnerDeterminator<T> getWdWithoutBidder(SATSBidder<T> bidder) {
         return baseWD.getWdWithoutBidder(bidder);
     }
 
     @Override
-    public Allocation<T> calculateAllocation() {
+    public SATSAllocation<T> calculateAllocation() {
         return getMechanismResult().getAllocation();
     }
 
@@ -60,19 +60,19 @@ public class CCGMechanism<T extends Good> implements AuctionMechanism<T> {
     }
 
     @Override
-    public void adjustPayoffs(Map<Bidder<T>, Double> payoffs) {
+    public void adjustPayoffs(Map<SATSBidder<T>, Double> payoffs) {
         baseWD.adjustPayoffs(payoffs);
     }
 
     private MechanismResult<T> calculateCCGPayments() {
         MechanismResult<T> vcgResult = new VCGMechanism<>(baseWD).getMechanismResult();
-        Allocation<T> originalAllocation = vcgResult.getAllocation();
+        SATSAllocation<T> originalAllocation = vcgResult.getAllocation();
 
         SolverClient solverClient = new SolverClient();
 
         Payment<T> payment = vcgResult.getPayment();
 
-        Map<Bidder<T>, Variable> paymentVariables = createPaymentVariables(originalAllocation, payment);
+        Map<SATSBidder<T>, Variable> paymentVariables = createPaymentVariables(originalAllocation, payment);
         MIP l1Mip = new MIP();
         paymentVariables.values().forEach(l1Mip::add);
         paymentVariables.values().forEach(v -> l1Mip.addObjectiveTerm(1, v));
@@ -80,15 +80,15 @@ public class CCGMechanism<T extends Good> implements AuctionMechanism<T> {
         double oldBlockingCoalitionValue = -1;
         boolean caughtInLoopDueToRoundingErrors = false;
         while (true) {
-            Map<Bidder<T>, Double> payoffs = computePayoffs(originalAllocation, payment);
+            Map<SATSBidder<T>, Double> payoffs = computePayoffs(originalAllocation, payment);
             WinnerDeterminator<T> blockingCoalitionMip = baseWD.copyOf();
             blockingCoalitionMip.adjustPayoffs(payoffs);
 
-            Allocation<T> blockingCoalition = blockingCoalitionMip.calculateAllocation();
+            SATSAllocation<T> blockingCoalition = blockingCoalitionMip.calculateAllocation();
 
             double traitorPayoffs = 0;
             double traitorPayments = 0;
-            for (Bidder<T> bidder : blockingCoalition.getWinners()) {
+            for (SATSBidder<T> bidder : blockingCoalition.getWinners()) {
                 traitorPayoffs += (originalAllocation.getTradeValue(bidder).doubleValue() - payment.paymentOf(bidder).getAmount());
                 traitorPayments += payment.paymentOf(bidder).getAmount();
             }
@@ -102,8 +102,8 @@ public class CCGMechanism<T extends Good> implements AuctionMechanism<T> {
             double payments = payment.getTotalPayments();
             if (caughtInLoopDueToRoundingErrors ||
                     z_p <= payments + 1e-6) {
-                Map<Bidder<T>, BidderPayment> unscaledPaymentMap = new HashMap<>();
-                for (Map.Entry<Bidder<T>, BidderPayment> entry : payment.getPaymentMap().entrySet()) {
+                Map<SATSBidder<T>, BidderPayment> unscaledPaymentMap = new HashMap<>();
+                for (Map.Entry<SATSBidder<T>, BidderPayment> entry : payment.getPaymentMap().entrySet()) {
                     unscaledPaymentMap.put(entry.getKey(), new BidderPayment(entry.getValue().getAmount() / scale.doubleValue()));
                 }
                 Payment<T> unscaledPayment = new Payment<>(unscaledPaymentMap);
@@ -112,7 +112,7 @@ public class CCGMechanism<T extends Good> implements AuctionMechanism<T> {
                 double coalitionValue = z_p - traitorPayments;
                 Constraint constraint = new Constraint(CompareType.GEQ, coalitionValue);
 
-                for (Bidder<T> nonTraitor : originalAllocation.getWinners()) {
+                for (SATSBidder<T> nonTraitor : originalAllocation.getWinners()) {
                     if (!blockingCoalition.getWinners().contains(nonTraitor)) {
                         Variable paymentVariable = paymentVariables.get(nonTraitor);
                         constraint.addTerm(1, paymentVariable);
@@ -137,7 +137,7 @@ public class CCGMechanism<T extends Good> implements AuctionMechanism<T> {
                 l2Mip.add(fixPayments1);
                 l2Mip.add(fixPayments2);
 
-                for (Map.Entry<Bidder<T>, Variable> entry : paymentVariables.entrySet()) {
+                for (Map.Entry<SATSBidder<T>, Variable> entry : paymentVariables.entrySet()) {
                     Variable winnerVariable = entry.getValue();
                     l2Mip.addObjectiveTerm(1, winnerVariable, winnerVariable);
                     l2Mip.addObjectiveTerm(-2 * vcgResult.getPayment().paymentOf(entry.getKey()).getAmount(), winnerVariable);
@@ -145,8 +145,8 @@ public class CCGMechanism<T extends Good> implements AuctionMechanism<T> {
 
                 IMIPResult l2Result = solverClient.solve(l2Mip);
 
-                Map<Bidder<T>, BidderPayment> paymentMap = new HashMap<>(originalAllocation.getWinners().size());
-                for (Bidder<T> company : originalAllocation.getWinners()) {
+                Map<SATSBidder<T>, BidderPayment> paymentMap = new HashMap<>(originalAllocation.getWinners().size());
+                for (SATSBidder<T> company : originalAllocation.getWinners()) {
                     double doublePayment = l2Result.getValue(paymentVariables.get(company));
                     paymentMap.put(company, new BidderPayment(doublePayment));
                 }
@@ -156,21 +156,21 @@ public class CCGMechanism<T extends Good> implements AuctionMechanism<T> {
 
     }
 
-    private Map<Bidder<T>, Double> computePayoffs(Allocation<T> allocation, Payment<T> payment) {
-        Map<Bidder<T>, Double> payoffs = new HashMap<>(allocation.getWinners().size());
-        for (Bidder<T> company : allocation.getWinners()) {
+    private Map<SATSBidder<T>, Double> computePayoffs(SATSAllocation<T> allocation, Payment<T> payment) {
+        Map<SATSBidder<T>, Double> payoffs = new HashMap<>(allocation.getWinners().size());
+        for (SATSBidder<T> company : allocation.getWinners()) {
             payoffs.put(company, allocation.getTradeValue(company).doubleValue() - payment.paymentOf(company).getAmount());
         }
         return payoffs;
     }
 
-    private Map<Bidder<T>, Variable> createPaymentVariables(Allocation<T> originalAllocation, Payment<T> payment) {
-        Map<Bidder<T>, Variable> winnerVariables = new HashMap<>(originalAllocation.getWinners().size());
-        for (Bidder<T> winner : originalAllocation.getWinners()) {
+    private Map<SATSBidder<T>, Variable> createPaymentVariables(SATSAllocation<T> originalAllocation, Payment<T> payment) {
+        Map<SATSBidder<T>, Variable> winnerVariables = new HashMap<>(originalAllocation.getWinners().size());
+        for (SATSBidder<T> winner : originalAllocation.getWinners()) {
 
             double winnerPayment = payment.paymentOf(winner).getAmount();
             double winnerValue = originalAllocation.getTradeValue(winner).doubleValue();
-            Variable winnerVariable = new Variable(String.valueOf(winner.getId()),
+            Variable winnerVariable = new Variable(String.valueOf(winner.getLongId()),
                     VarType.DOUBLE,
                     0 /* FIXME: For MRVM, the payment sometimes is > 0 even if the value is 0. Bug or normal? */,
                     winnerValue);

@@ -1,14 +1,14 @@
 package org.spectrumauctions.sats.core.bidlang.generic;
 
 import com.google.gson.JsonElement;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSGood;
 
 import java.util.Set;
 
 /**
  * @author Michael Weiss
  */
-public interface GenericDefinition<T extends Good> {
+public interface GenericDefinition<T extends SATSGood> {
 
     boolean isPartOf(T license);
 

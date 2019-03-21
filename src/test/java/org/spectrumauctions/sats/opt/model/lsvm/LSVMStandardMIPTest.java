@@ -8,7 +8,7 @@ import org.spectrumauctions.sats.core.model.lsvm.*;
 import org.spectrumauctions.sats.core.util.random.DoubleInterval;
 import org.spectrumauctions.sats.core.util.random.IntegerInterval;
 import org.spectrumauctions.sats.core.util.random.JavaUtilRNGSupplier;
-import org.spectrumauctions.sats.opt.domain.ItemAllocation;
+import org.spectrumauctions.sats.opt.domain.ItemSATSAllocation;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -58,7 +58,7 @@ public class LSVMStandardMIPTest {
 		List<LSVMBidder> population = customPopulation(world, 2, 1);
 
 		LSVMStandardMIP lsvmMIP = new LSVMStandardMIP(world, population);
-		ItemAllocation<LSVMLicense> allocation = lsvmMIP.calculateAllocation();
+		ItemSATSAllocation<LSVMLicense> allocation = lsvmMIP.calculateAllocation();
 
 		testTotalValue(population, allocation);
 	}
@@ -69,14 +69,14 @@ public class LSVMStandardMIPTest {
 		List<LSVMBidder> population = model.createPopulation(world, seed);
 
 		LSVMStandardMIP lsvmMIP = new LSVMStandardMIP(world, population);
-		ItemAllocation<LSVMLicense> allocation = lsvmMIP.calculateAllocation();
+		ItemSATSAllocation<LSVMLicense> allocation = lsvmMIP.calculateAllocation();
 
 		Assert.assertEquals("Error Objective Value not matching Test Data Seed: " + seed, seedMap.get(seed),
 				allocation.getTotalValue().doubleValue(), 0.0000001);
 		testTotalValue(population, allocation);
 	}
 
-	private void testTotalValue(List<LSVMBidder> population, ItemAllocation<LSVMLicense> allocation) {
+	private void testTotalValue(List<LSVMBidder> population, ItemSATSAllocation<LSVMLicense> allocation) {
 		BigDecimal totalValue = new BigDecimal(0);
 
 		for (LSVMBidder bidder : population) {
@@ -95,7 +95,7 @@ public class LSVMStandardMIPTest {
 		LSVMBidderSetup.RegionalBidderBuilder regionalBidderBuilder = new LSVMBidderSetup.RegionalBidderBuilder();
 		regionalBidderBuilder.setProximitySize(1);
 		regionalBidderBuilder.setNumberOfBidders(numberOfRegionalBidders);
-		regionalBidderBuilder.setSetupName("Test Regional Bidder");
+		regionalBidderBuilder.setSetupName("Test Regional SATSBidder");
 		regionalBidderBuilder.setValueInterval(new DoubleInterval(10));
 		regionalBidderBuilder.setLsvmA(0);
 		regionalBidderBuilder.setLsvmB(5);
@@ -103,7 +103,7 @@ public class LSVMStandardMIPTest {
 		LSVMBidderSetup.NationalBidderBuilder nationalBidderBuilder = new LSVMBidderSetup.NationalBidderBuilder();
 		nationalBidderBuilder.setNumberOfBidders(numberOfNationalBidders);
 		nationalBidderBuilder.setValueInterval(new DoubleInterval(4));
-		nationalBidderBuilder.setSetupName("Test National Bidder");
+		nationalBidderBuilder.setSetupName("Test National SATSBidder");
 
 		List<LSVMBidderSetup> setups = new ArrayList<>();
 		setups.add(regionalBidderBuilder.build());

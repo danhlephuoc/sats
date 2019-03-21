@@ -236,6 +236,12 @@
         </dependency>
 
         <dependency>
+            <groupId>ch.uzh.ifi.ce</groupId>
+            <artifactId>market-mechanisms</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
             <groupId>edu.harvard.eecs</groupId>
             <artifactId>jopt</artifactId>
             <version>1.3.3</version>
@@ -247,6 +253,17 @@
             <version>12.8</version>
             <scope>provided</scope>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.12.1</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

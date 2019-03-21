@@ -1,23 +1,23 @@
 package org.spectrumauctions.sats.core.bidlang.generic;
 
 
-import org.spectrumauctions.sats.core.model.Bidder;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSBidder;
+import org.spectrumauctions.sats.core.model.SATSGood;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class GenericBid<S extends GenericDefinition<T>, T extends Good> {
+public class GenericBid<S extends GenericDefinition<T>, T extends SATSGood> {
 
-    private final Bidder<T> bidder;
+    private final SATSBidder<T> bidder;
     private List<GenericValue<S, T>> values;
 
-    public GenericBid(Bidder<T> bidder, List<GenericValue<S, T>> values) {
+    public GenericBid(SATSBidder<T> bidder, List<GenericValue<S, T>> values) {
         this.bidder = bidder;
         this.values = values;
     }
 
-    public Bidder<T> getBidder() {
+    public SATSBidder<T> getBidder() {
         return bidder;
     }
 

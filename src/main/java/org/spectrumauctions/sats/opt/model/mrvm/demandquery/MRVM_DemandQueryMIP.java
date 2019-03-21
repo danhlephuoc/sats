@@ -47,7 +47,7 @@ public class MRVM_DemandQueryMIP implements GenericDemandQueryMIP<MRVMGenericDef
         Preconditions.checkArgument(prices.size() == world.getAllGenericDefinitions().size());
         mrvmMip = new MRVM_MIP(Sets.newHashSet(bidder));
 
-        mrvmMip.getMip().setSolveParam(SolveParam.RELATIVE_OBJ_GAP, epsilon);
+        mrvmMip.getMIP().setSolveParam(SolveParam.RELATIVE_OBJ_GAP, epsilon);
         double scalingFactor = mrvmMip.getBidderPartialMips().get(bidder).getScalingFactor();
         priceVar = new Variable("p", VarType.DOUBLE, 0, MIP.MAX_VALUE);
         mrvmMip.addVariable(priceVar);
@@ -75,10 +75,10 @@ public class MRVM_DemandQueryMIP implements GenericDemandQueryMIP<MRVMGenericDef
             return Lists.newArrayList();
         }
 
-        mrvmMip.getMip().setSolveParam(SolveParam.SOLUTION_POOL_CAPACITY, numberOfResults);
-        mrvmMip.getMip().setSolveParam(SolveParam.SOLUTION_POOL_MODE, 4);
-        mrvmMip.getMip().setVariablesOfInterest(mrvmMip.getXVariables());
-        IMIPResult mipResult = solver.solve(mrvmMip.getMip());
+        mrvmMip.getMIP().setSolveParam(SolveParam.SOLUTION_POOL_CAPACITY, numberOfResults);
+        mrvmMip.getMIP().setSolveParam(SolveParam.SOLUTION_POOL_MODE, 4);
+        mrvmMip.getMIP().setVariablesOfInterest(mrvmMip.getXVariables());
+        IMIPResult mipResult = solver.solve(mrvmMip.getMIP());
         logger.debug("Result:\n{}", mipResult);
 
         List<MRVMDemandQueryMipResult> results = new ArrayList<>();

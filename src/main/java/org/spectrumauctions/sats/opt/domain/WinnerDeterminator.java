@@ -5,8 +5,8 @@
  */
 package org.spectrumauctions.sats.opt.domain;
 
-import org.spectrumauctions.sats.core.model.Bidder;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSBidder;
+import org.spectrumauctions.sats.core.model.SATSGood;
 
 import java.util.Map;
 
@@ -14,14 +14,15 @@ import java.util.Map;
  * @author Michael Weiss
  *
  */
-public interface WinnerDeterminator<T extends Good> {
+// TODO: Remove such that the mechanism library's WinnerDetermination / the ModelMIP class is used
+public interface WinnerDeterminator<T extends SATSGood> {
 
-    WinnerDeterminator<T> getWdWithoutBidder(Bidder<T> bidder);
+        WinnerDeterminator<T> getWdWithoutBidder(SATSBidder<T> bidder);
 
-    Allocation<T> calculateAllocation();
+        SATSAllocation<T> calculateAllocation();
 
-    WinnerDeterminator<T> copyOf();
+        WinnerDeterminator<T> copyOf();
 
-    void adjustPayoffs(Map<Bidder<T>, Double> payoffs);
+        void adjustPayoffs(Map<SATSBidder<T>, Double> payoffs);
 
 }

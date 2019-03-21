@@ -1,7 +1,6 @@
 package org.spectrumauctions.sats.opt.xorq;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.math.DoubleMath;
 import edu.harvard.econcs.jopt.solver.IMIP;
 import edu.harvard.econcs.jopt.solver.IMIPResult;
@@ -11,17 +10,13 @@ import edu.harvard.econcs.jopt.solver.mip.*;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericBid;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericDefinition;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValue;
-import org.spectrumauctions.sats.core.bidlang.generic.GenericValueBidder;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.GenericWorld;
-import org.spectrumauctions.sats.core.model.Good;
-import org.spectrumauctions.sats.core.model.World;
-import org.spectrumauctions.sats.opt.domain.Allocation;
-import org.spectrumauctions.sats.opt.domain.GenericAllocation;
+import org.spectrumauctions.sats.core.model.SATSGood;
+import org.spectrumauctions.sats.opt.domain.GenericSATSAllocation;
+import org.spectrumauctions.sats.opt.domain.SATSAllocation;
 import org.spectrumauctions.sats.opt.domain.WinnerDeterminator;
 
-import java.math.BigDecimal;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -29,11 +24,11 @@ import java.util.stream.Collectors;
 
 import static edu.harvard.econcs.jopt.solver.mip.MIP.MAX_VALUE;
 
-public class XORQWinnerDetermination<G extends GenericDefinition<T>, T extends Good> implements WinnerDeterminator<T> {
+public class XORQWinnerDetermination<G extends GenericDefinition<T>, T extends SATSGood> implements WinnerDeterminator<T> {
     private Map<GenericValue<G, T>, Variable> bidVariables = new HashMap<>();
     private Set<GenericBid<G, T>> bids;
     private IMIP winnerDeterminationProgram;
-    private Allocation<T> result = null;
+    private SATSAllocation<T> result = null;
     private GenericWorld<T> world;
     private double scalingFactor = 1;
 
@@ -101,19 +96,19 @@ public class XORQWinnerDetermination<G extends GenericDefinition<T>, T extends G
         return winnerDeterminationProgram;
     }
 
-    private Allocation<T> solveWinnerDetermination() {
+    private SATSAllocation<T> solveWinnerDetermination() {
         IMIPSolver solver = new SolverClient();
         IMIPResult mipResult = solver.solve(getMIP());
         return adaptMIPResult(mipResult);
     }
 
     @Override
-    public WinnerDeterminator<T> getWdWithoutBidder(Bidder<T> bidder) {
+    public WinnerDeterminator<T> getWdWithoutBidder(SATSBidder<T> bidder) {
         return new XORQWinnerDetermination<>(bids.stream().filter(b -> !b.getBidder().equals(bidder)).collect(Collectors.toSet()));
     }
 
     @Override
-    public Allocation<T> calculateAllocation() {
+    public SATSAllocation<T> calculateAllocation() {
         if (result == null) {
             result = solveWinnerDetermination();
         }
@@ -126,9 +121,9 @@ public class XORQWinnerDetermination<G extends GenericDefinition<T>, T extends G
     }
 
     @Override
-    public void adjustPayoffs(Map<Bidder<T>, Double> payoffs) {
+    public void adjustPayoffs(Map<SATSBidder<T>, Double> payoffs) {
         for (GenericBid<G, T> bidPerBidder : bids) {
-            Variable x = new Variable("x_" + bidPerBidder.getBidder().getId(), VarType.BOOLEAN, 0, 1);
+            Variable x = new Variable("x_" + bidPerBidder.getBidder().getLongId(), VarType.BOOLEAN, 0, 1);
             winnerDeterminationProgram.add(x);
             winnerDeterminationProgram.addObjectiveTerm(-payoffs.getOrDefault(bidPerBidder.getBidder(), 0.0), x);
 
@@ -147,9 +142,9 @@ public class XORQWinnerDetermination<G extends GenericDefinition<T>, T extends G
         return bidVariables.get(bundleBid);
     }
 
-    private Allocation<T> adaptMIPResult(IMIPResult mipResult) {
+    private SATSAllocation<T> adaptMIPResult(IMIPResult mipResult) {
 
-        GenericAllocation.Builder<G, T> builder = new GenericAllocation.Builder<>();
+        GenericSATSAllocation.Builder<G, T> builder = new GenericSATSAllocation.Builder<>();
         for (GenericBid<G, T> bid : bids) {
             for (GenericValue<G, T> value : bid.getValues()) {
                 if (DoubleMath.fuzzyEquals(mipResult.getValue(getBidVariable(value)), 1, 1e-3)) {
@@ -158,6 +153,6 @@ public class XORQWinnerDetermination<G extends GenericDefinition<T>, T extends G
             }
         }
 
-        return new GenericAllocation<>(builder);
+        return new GenericSATSAllocation<>(builder);
     }
 }

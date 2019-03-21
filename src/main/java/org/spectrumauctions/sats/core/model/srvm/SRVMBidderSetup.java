@@ -217,10 +217,10 @@ public class SRVMBidderSetup extends BidderSetup {
     public static final class SmallBidderBuilder extends Builder {
 
         /**
-         * Create a BidderSetup Builder with Primary Bidder default values (see Kreoemer et. al (2014)).
+         * Create a BidderSetup Builder with Primary SATSBidder default values (see Kreoemer et. al (2014)).
          */
         public SmallBidderBuilder() {
-            super("Small Bidder Setup", 2);
+            super("Small SATSBidder Setup", 2);
             putMeanBaseValue(SRVMWorldSetup.Builder.BAND_NAME_A, new BigDecimal(0));
             putMeanBaseValue(SRVMWorldSetup.Builder.BAND_NAME_B, new BigDecimal(0));
             putMeanBaseValue(SRVMWorldSetup.Builder.BAND_NAME_C, new BigDecimal(8));
@@ -234,10 +234,10 @@ public class SRVMBidderSetup extends BidderSetup {
     public static final class HighFrequenceBidderBuilder extends Builder {
 
         /**
-         * Create a BidderSetup Builder with 2.6GHz Bidder default values (see Kreoemer et. al (2014)).
+         * Create a BidderSetup Builder with 2.6GHz SATSBidder default values (see Kreoemer et. al (2014)).
          */
         public HighFrequenceBidderBuilder() {
-            super("2.6 Ghz Bidder (High Frequence Bidder) Setup", 1);
+            super("2.6 Ghz SATSBidder (High Frequence SATSBidder) Setup", 1);
             putMeanBaseValue(SRVMWorldSetup.Builder.BAND_NAME_A, new BigDecimal(0));
             putMeanBaseValue(SRVMWorldSetup.Builder.BAND_NAME_B, new BigDecimal(70));
             putMeanBaseValue(SRVMWorldSetup.Builder.BAND_NAME_C, new BigDecimal(15));
@@ -251,10 +251,10 @@ public class SRVMBidderSetup extends BidderSetup {
     public static final class SecondaryBidderBuilder extends Builder {
 
         /**
-         * Create a BidderSetup Builder with Secondary Bidder default values (see Kreoemer et. al (2014)).
+         * Create a BidderSetup Builder with Secondary SATSBidder default values (see Kreoemer et. al (2014)).
          */
         public SecondaryBidderBuilder() {
-            super("Secondary Bidder Setup", 2);
+            super("Secondary SATSBidder Setup", 2);
             putMeanBaseValue(SRVMWorldSetup.Builder.BAND_NAME_A, new BigDecimal(200));
             putMeanBaseValue(SRVMWorldSetup.Builder.BAND_NAME_B, new BigDecimal(70));
             putMeanBaseValue(SRVMWorldSetup.Builder.BAND_NAME_C, new BigDecimal(15));
@@ -269,10 +269,10 @@ public class SRVMBidderSetup extends BidderSetup {
     public static final class PrimaryBidderBuilder extends Builder {
 
         /**
-         * Create a BidderSetup Builder with Primary Bidder default values (see Kreoemer et. al (2014)).
+         * Create a BidderSetup Builder with Primary SATSBidder default values (see Kreoemer et. al (2014)).
          */
         public PrimaryBidderBuilder() {
-            super("Primary Bidder Setup", 2);
+            super("Primary SATSBidder Setup", 2);
             putMeanBaseValue(SRVMWorldSetup.Builder.BAND_NAME_A, new BigDecimal(300));
             putMeanBaseValue(SRVMWorldSetup.Builder.BAND_NAME_B, new BigDecimal(70));
             putMeanBaseValue(SRVMWorldSetup.Builder.BAND_NAME_C, new BigDecimal(15));

@@ -30,8 +30,8 @@ import java.util.List;
 @RunWith(Parameterized.class)
 public class BMValueTest {
 
-    private static final String SETUP_BVM = "Deterministic BVM Test Bidder";
-    private static final String SETUP_MBVM = "Deterministic MBVM Test Bidder";
+    private static final String SETUP_BVM = "Deterministic BVM Test SATSBidder";
+    private static final String SETUP_MBVM = "Deterministic MBVM Test SATSBidder";
 
     private final BMBidder bidder;
     private final String setup;

@@ -25,13 +25,13 @@ public class GSVMRegionalBidderSetup extends GSVMBidderSetup {
         // Add the national licenses
         for (GSVMLicense license : world.getNationalCircle().getLicenses()) {
             if (isInProximity(license.getPosition(), bidder.getBidderPosition(), world.getSize(), true)) {
-                values.put(license.getId(), getValueDependingOnRegion(rng, license.getPosition(), world.getSize()));
+                values.put(license.getLongId(), getValueDependingOnRegion(rng, license.getPosition(), world.getSize()));
             }
         }
         // Add the regional licenses
         for (GSVMLicense license : world.getRegionalCircle().getLicenses()) {
             if (isInProximity(license.getPosition(), bidder.getBidderPosition(), world.getSize(), false)) {
-                values.put(license.getId(), rng.nextBigDecimal(getRegionalValueInterval()));
+                values.put(license.getLongId(), rng.nextBigDecimal(getRegionalValueInterval()));
             }
         }
         return values;
@@ -52,7 +52,7 @@ public class GSVMRegionalBidderSetup extends GSVMBidderSetup {
          * Create a BidderSetup Builder
          */
         public Builder() {
-            super("Regional Bidder Setup", 6,
+            super("Regional SATSBidder Setup", 6,
                     new DoubleInterval(0, 20), new DoubleInterval(0, 40), new DoubleInterval(0, 20));
         }
 

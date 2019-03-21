@@ -78,7 +78,7 @@ public final class MRVMWorld extends World implements GenericWorld {
      * @see World#restorePopulation(long)
      */
     @Override
-    public Collection<? extends Bidder<MRVMLicense>> restorePopulation(long populationId) {
+    public Collection<? extends SATSBidder<MRVMLicense>> restorePopulation(long populationId) {
         return super.restorePopulation(MRVMBidder.class, populationId);
     }
 
@@ -285,7 +285,7 @@ public final class MRVMWorld extends World implements GenericWorld {
     }
 
     @Override
-    public GenericDefinition getGenericDefinitionOf(Good license) {
+    public GenericDefinition getGenericDefinitionOf(SATSGood license) {
         MRVMLicense mrvmLicense = (MRVMLicense) license;
         Preconditions.checkArgument(genericDefinitions.containsKey(mrvmLicense.getRegion()));
         Preconditions.checkArgument(genericDefinitions.get(mrvmLicense.getRegion()).containsKey(mrvmLicense.getBand()));

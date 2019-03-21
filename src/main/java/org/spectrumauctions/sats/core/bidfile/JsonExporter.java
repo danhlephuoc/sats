@@ -11,8 +11,7 @@ import org.spectrumauctions.sats.core.bidlang.generic.GenericLang;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValue;
 import org.spectrumauctions.sats.core.bidlang.xor.XORLanguage;
 import org.spectrumauctions.sats.core.bidlang.xor.XORValue;
-import org.spectrumauctions.sats.core.model.Good;
-import org.spectrumauctions.sats.core.model.bvm.BMLicense;
+import org.spectrumauctions.sats.core.model.SATSGood;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,12 +43,12 @@ public class JsonExporter extends FileWriter {
      * @see FileWriter#writeMultiBidderXOR(java.util.Collection, int, java.lang.String)
      */
     @Override
-    public File writeMultiBidderXOR(Collection<XORLanguage<? extends Good>> valueFunctions, int numberOfBids, String filePrefix)
+    public File writeMultiBidderXOR(Collection<XORLanguage<? extends SATSGood>> valueFunctions, int numberOfBids, String filePrefix)
             throws IOException {
         JsonArray json = new JsonArray();
-        for (XORLanguage<? extends Good> lang : valueFunctions) {
+        for (XORLanguage<? extends SATSGood> lang : valueFunctions) {
             JsonObject thisBidder = new JsonObject();
-            thisBidder.addProperty("bidder", lang.getBidder().getId());
+            thisBidder.addProperty("bidder", lang.getBidder().getLongId());
             thisBidder.add("bids", singleBidderXOR(lang, numberOfBids, filePrefix));
             json.add(thisBidder);
         }
@@ -57,15 +56,15 @@ public class JsonExporter extends FileWriter {
     }
 
 
-    private JsonElement singleBidderXOR(XORLanguage<? extends Good> lang, int numberOfBids, String filePrefix) {
+    private JsonElement singleBidderXOR(XORLanguage<? extends SATSGood> lang, int numberOfBids, String filePrefix) {
         JsonArray result = new JsonArray();
         Iterator iter = lang.iterator();
         for (int i = 0; i < numberOfBids && iter.hasNext(); i++) {
             JsonObject bid = new JsonObject();
-            XORValue<Good> xorValue = (XORValue) iter.next();
+            XORValue<SATSGood> xorValue = (XORValue) iter.next();
             JsonArray licenses = new JsonArray();
-            for (Good license : xorValue.getLicenses()) {
-                licenses.add(license.getId());
+            for (SATSGood license : xorValue.getLicenses()) {
+                licenses.add(license.getLongId());
             }
             bid.add("licenses", licenses);
             bid.addProperty("value", roundedValue(xorValue.value().doubleValue()));
@@ -78,7 +77,7 @@ public class JsonExporter extends FileWriter {
      * @see FileWriter#writeSingleBidderXOR(XORLanguage, int, java.lang.String)
      */
     @Override
-    public File writeSingleBidderXOR(XORLanguage<? extends Good> valueFunction, int numberOfBids, String filePrefix)
+    public File writeSingleBidderXOR(XORLanguage<? extends SATSGood> valueFunction, int numberOfBids, String filePrefix)
             throws IOException {
         JsonElement singleBidder = singleBidderXOR(valueFunction, numberOfBids, filePrefix);
         return write(singleBidder, filePrefix);
@@ -88,12 +87,12 @@ public class JsonExporter extends FileWriter {
      * @see FileWriter#writeMultiBidderXORQ(java.util.Collection, int, java.lang.String)
      */
     @Override
-    public File writeMultiBidderXORQ(Collection<GenericLang<GenericDefinition<? extends Good>, ?>> valueFunctions, int numberOfBids,
+    public File writeMultiBidderXORQ(Collection<GenericLang<GenericDefinition<? extends SATSGood>, ?>> valueFunctions, int numberOfBids,
                                      String filePrefix) throws IOException {
         JsonArray json = new JsonArray();
-        for (GenericLang<GenericDefinition<? extends Good>, ?> lang : valueFunctions) {
+        for (GenericLang<GenericDefinition<? extends SATSGood>, ?> lang : valueFunctions) {
             JsonObject thisBidder = new JsonObject();
-            thisBidder.addProperty("bidder", lang.getBidder().getId());
+            thisBidder.addProperty("bidder", lang.getBidder().getLongId());
             thisBidder.add("bids", singleBidderXORQ(lang, numberOfBids, filePrefix));
             json.add(thisBidder);
         }
@@ -104,20 +103,20 @@ public class JsonExporter extends FileWriter {
      * @see FileWriter#writeSingleBidderXORQ(GenericLang, int, java.lang.String)
      */
     @Override
-    public File writeSingleBidderXORQ(GenericLang<GenericDefinition<? extends Good>, ?> lang, int numberOfBids, String filePrefix)
+    public File writeSingleBidderXORQ(GenericLang<GenericDefinition<? extends SATSGood>, ?> lang, int numberOfBids, String filePrefix)
             throws IOException {
         JsonElement singleBidder = singleBidderXORQ(lang, numberOfBids, filePrefix);
         return write(singleBidder, filePrefix);
     }
 
-    private JsonElement singleBidderXORQ(GenericLang<GenericDefinition<? extends Good>, ?> lang, int numberOfBids, String filePrefix) {
+    private JsonElement singleBidderXORQ(GenericLang<GenericDefinition<? extends SATSGood>, ?> lang, int numberOfBids, String filePrefix) {
         JsonArray result = new JsonArray();
-        Iterator<? extends GenericValue<GenericDefinition<? extends Good>, ?>> iter = lang.iterator();
+        Iterator<? extends GenericValue<GenericDefinition<? extends SATSGood>, ?>> iter = lang.iterator();
         for (int i = 0; i < numberOfBids && iter.hasNext(); i++) {
             JsonObject bid = new JsonObject();
-            GenericValue<GenericDefinition<? extends Good>, ?> val = iter.next();
+            GenericValue<GenericDefinition<? extends SATSGood>, ?> val = iter.next();
             JsonArray quantities = new JsonArray();
-            for (Entry<GenericDefinition<? extends Good>, Integer> quant : val.getQuantities().entrySet()) {
+            for (Entry<GenericDefinition<? extends SATSGood>, Integer> quant : val.getQuantities().entrySet()) {
                 if (quant.getValue() != 0 || !ONLY_NONZERO_QUANTITIES) {
                     JsonObject object = new JsonObject();
                     object.add("generic definition", quant.getKey().shortJson());

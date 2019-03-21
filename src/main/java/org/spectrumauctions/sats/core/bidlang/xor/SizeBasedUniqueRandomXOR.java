@@ -7,9 +7,9 @@ package org.spectrumauctions.sats.core.bidlang.xor;
 
 import com.google.common.math.BigIntegerMath;
 import org.spectrumauctions.sats.core.bidlang.MissingInformationException;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.Bundle;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSGood;
 import org.spectrumauctions.sats.core.util.random.GaussianDistributionRNG;
 import org.spectrumauctions.sats.core.util.random.RNGSupplier;
 import org.spectrumauctions.sats.core.util.random.UniformDistributionRNG;
@@ -19,16 +19,16 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
-public class SizeBasedUniqueRandomXOR<T extends Good> implements XORLanguage<T> {
+public class SizeBasedUniqueRandomXOR<T extends SATSGood> implements XORLanguage<T> {
     private int meanBundleSize = -1;
     private double standardDeviation = -1;
     private Collection<T> goods;
     private long seed;
     private final RNGSupplier rngSupplier;
     private int iterations = -1;
-    private Bidder<T> bidder;
+    private SATSBidder<T> bidder;
 
-    public SizeBasedUniqueRandomXOR(Collection<T> goods, RNGSupplier rngSupplier, Bidder<T> bidder) {
+    public SizeBasedUniqueRandomXOR(Collection<T> goods, RNGSupplier rngSupplier, SATSBidder<T> bidder) {
         this.goods = goods;
         this.seed = rngSupplier.getUniformDistributionRNG().nextLong();
         this.rngSupplier = rngSupplier;
@@ -40,7 +40,7 @@ public class SizeBasedUniqueRandomXOR<T extends Good> implements XORLanguage<T> 
     }
 
     @Override
-    public Bidder<T> getBidder() {
+    public SATSBidder<T> getBidder() {
         return bidder;
     }
 

@@ -4,13 +4,13 @@ import org.spectrumauctions.sats.core.bidlang.generic.GenericDefinition;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericLang;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValue;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValueBidder;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSGood;
 import org.spectrumauctions.sats.core.model.UnsupportedBiddingLanguageException;
 
 import java.util.*;
 import java.util.Map.Entry;
 
-public abstract class GenericPowerset<T extends GenericDefinition<S>, S extends Good> implements GenericLang<T, S> {
+public abstract class GenericPowerset<T extends GenericDefinition<S>, S extends SATSGood> implements GenericLang<T, S> {
 
     final Map<T, Integer> maxQuantities;
     final int maxBundleSize;

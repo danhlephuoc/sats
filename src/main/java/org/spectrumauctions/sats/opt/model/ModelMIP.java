@@ -1,14 +1,61 @@
 package org.spectrumauctions.sats.opt.model;
 
+import ch.uzh.ifi.ce.domain.*;
+import ch.uzh.ifi.ce.mechanisms.MetaInfo;
+import ch.uzh.ifi.ce.mechanisms.winnerdetermination.WinnerDetermination;
+import com.google.common.collect.Sets;
+import edu.harvard.econcs.jopt.solver.IMIP;
+import edu.harvard.econcs.jopt.solver.ISolution;
 import edu.harvard.econcs.jopt.solver.SolveParam;
 import edu.harvard.econcs.jopt.solver.mip.MIP;
+import edu.harvard.econcs.jopt.solver.mip.Variable;
+import org.spectrumauctions.sats.core.model.SATSBidder;
+import org.spectrumauctions.sats.core.model.SATSGood;
+import org.spectrumauctions.sats.opt.domain.SATSAllocation;
+
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Fabio Isler
  */
-public abstract class ModelMIP {
+public abstract class ModelMIP extends WinnerDetermination {
 
-    private MIP mip = new MIP();
+    public ModelMIP() {
+        super(new AuctionInstance(new Bids()));
+    }
+
+    @Override
+    protected Variable getBidVariable(BundleBid bundleBid) {
+        return null;
+    }
+
+    @Override
+    protected Allocation adaptMIPResult(ISolution mipResult) {
+
+        SATSAllocation allocation = calculateAllocation();
+        Map<Bidder, BidderAllocation> allocationMap = new HashMap<>();
+        for (Object winner : allocation.getWinners()) {
+            SATSBidder bidder = (SATSBidder) winner;
+            BigDecimal tradeValue = allocation.getTradeValue(bidder);
+            Set<Good> goods = Sets.newHashSet(allocation.getAllocation(bidder));
+            BidderAllocation bidderAllocation = new BidderAllocation(tradeValue, goods, Sets.newHashSet());
+            allocationMap.put(bidder, bidderAllocation);
+        }
+
+        MetaInfo metaInfo = new MetaInfo();
+        metaInfo.setNumberOfMIPs(1);
+        metaInfo.setMipSolveTime(mipResult.getSolveTime());
+        return new Allocation(allocationMap, new Bids(), metaInfo);
+    }
+
+    protected abstract SATSAllocation calculateAllocation();
+    public abstract ModelMIP getMIPWithout(Bidder bidder);
+    public abstract ModelMIP copyOf();
+
+    private IMIP mip = new MIP();
 
     /**
      * This is mainly used for testing or if you need to access special SolveParams.
@@ -16,7 +63,7 @@ public abstract class ModelMIP {
      *
      * @return reference to the JOpt mip
      */
-    public MIP getMip() {
+    public IMIP getMIP() {
         return mip;
     }
 

@@ -39,7 +39,7 @@ public class LSVMBidderSetup extends BidderSetup {
         UniformDistributionRNG rng = rngSupplier.getUniformDistributionRNG();
         HashMap<Long, BigDecimal> values = new HashMap<>();
         for (LSVMLicense license : lsvmBidder.getProximity()) {
-            values.put(license.getId(), rng.nextBigDecimal(this.valueInterval));
+            values.put(license.getLongId(), rng.nextBigDecimal(this.valueInterval));
         }
         return values;
     }
@@ -100,7 +100,7 @@ public class LSVMBidderSetup extends BidderSetup {
          * Create a BidderSetup Builder
          */
         public NationalBidderBuilder() {
-            super("National Bidder Setup", 1, new DoubleInterval(3, 9), -1, 320, 10);
+            super("National SATSBidder Setup", 1, new DoubleInterval(3, 9), -1, 320, 10);
         }
 
 
@@ -112,7 +112,7 @@ public class LSVMBidderSetup extends BidderSetup {
          * Create a BidderSetup Builder
          */
         public RegionalBidderBuilder() {
-            super("Regional Bidder Setup", 5, new DoubleInterval(3, 20), 2, 160, 4);
+            super("Regional SATSBidder Setup", 5, new DoubleInterval(3, 20), 2, 160, 4);
         }
 
         public void setProximitySize(int proximitySize) {

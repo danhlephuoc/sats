@@ -1,18 +1,18 @@
 package org.spectrumauctions.sats.mechanism.vcg;
 
-import org.spectrumauctions.sats.core.model.Bidder;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSBidder;
+import org.spectrumauctions.sats.core.model.SATSGood;
 import org.spectrumauctions.sats.mechanism.domain.MechanismResult;
 import org.spectrumauctions.sats.mechanism.domain.BidderPayment;
 import org.spectrumauctions.sats.mechanism.domain.Payment;
 import org.spectrumauctions.sats.mechanism.domain.mechanisms.AuctionMechanism;
-import org.spectrumauctions.sats.opt.domain.Allocation;
+import org.spectrumauctions.sats.opt.domain.SATSAllocation;
 import org.spectrumauctions.sats.opt.domain.WinnerDeterminator;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class VCGMechanism<T extends Good> implements AuctionMechanism<T> {
+public class VCGMechanism<T extends SATSGood> implements AuctionMechanism<T> {
 
     private WinnerDeterminator<T> baseWD;
     private MechanismResult<T> result;
@@ -36,12 +36,12 @@ public class VCGMechanism<T extends Good> implements AuctionMechanism<T> {
     }
 
     @Override
-    public WinnerDeterminator<T> getWdWithoutBidder(Bidder<T> bidder) {
+    public WinnerDeterminator<T> getWdWithoutBidder(SATSBidder<T> bidder) {
         return baseWD.getWdWithoutBidder(bidder);
     }
 
     @Override
-    public Allocation<T> calculateAllocation() {
+    public SATSAllocation<T> calculateAllocation() {
         return getMechanismResult().getAllocation();
     }
 
@@ -51,22 +51,22 @@ public class VCGMechanism<T extends Good> implements AuctionMechanism<T> {
     }
 
     @Override
-    public void adjustPayoffs(Map<Bidder<T>, Double> payoffs) {
+    public void adjustPayoffs(Map<SATSBidder<T>, Double> payoffs) {
         baseWD.adjustPayoffs(payoffs);
     }
 
     private MechanismResult<T> calculateVCGPayments() {
-        Allocation<T> baseAllocation = baseWD.calculateAllocation();
+        SATSAllocation<T> baseAllocation = baseWD.calculateAllocation();
 
-        Map<Bidder<T>, BidderPayment> payments = new HashMap<>();
-        for (Bidder<T> bidder : baseAllocation.getWinners()) {
+        Map<SATSBidder<T>, BidderPayment> payments = new HashMap<>();
+        for (SATSBidder<T> bidder : baseAllocation.getWinners()) {
 
             double baseAllocationTotalValue = baseAllocation.getTotalValue().doubleValue();
             double baseAllocationBidderValue = baseAllocation.getTradeValue(bidder).doubleValue();
             double valueWithoutBidder = baseAllocationTotalValue - baseAllocationBidderValue;
 
             WinnerDeterminator<T> wdWithoutBidder = baseWD.getWdWithoutBidder(bidder);
-            Allocation<T> allocationWithoutBidder = wdWithoutBidder.calculateAllocation();
+            SATSAllocation<T> allocationWithoutBidder = wdWithoutBidder.calculateAllocation();
             double valueWDWithoutBidder = allocationWithoutBidder.getTotalValue().doubleValue();
 
             double paymentAmount = valueWDWithoutBidder - valueWithoutBidder;

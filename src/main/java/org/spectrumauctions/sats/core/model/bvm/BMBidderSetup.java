@@ -22,7 +22,7 @@ import java.util.Map.Entry;
 
 
 /**
- * A configuration of a Bidder, 
+ * A configuration of a SATSBidder,
  * i.e., the specification of the random parameters of the bidder.
  *
  * @author Michael Weiss
@@ -53,7 +53,7 @@ public abstract class BMBidderSetup extends BidderSetup {
     public Integer drawPositiveValueThreshold(BMBand band, UniformDistributionRNG rng) {
         IntegerInterval interval = positiveValueThresholdIntervals.get(band.getName());
         if (interval == null) {
-            throw new IncompatibleWorldException("Band name unknown to Bidder Setup");
+            throw new IncompatibleWorldException("Band name unknown to SATSBidder Setup");
         } else {
             return rng.nextInt(interval);
         }
@@ -67,7 +67,7 @@ public abstract class BMBidderSetup extends BidderSetup {
     public BigDecimal drawBaseValue(BMBand band, UniformDistributionRNG rng) {
         DoubleInterval interval = baseValueIntervals.get(band.getName());
         if (interval == null) {
-            throw new IncompatibleWorldException("Band name unknown to Bidder Setup");
+            throw new IncompatibleWorldException("Band name unknown to SATSBidder Setup");
         } else {
             return rng.nextBigDecimal(interval);
         }
@@ -80,7 +80,7 @@ public abstract class BMBidderSetup extends BidderSetup {
     public Map<Integer, BigDecimal> drawSynergyFactors(BMBand band, UniformDistributionRNG rng) {
         Map<Integer, BigDecimal> bandSynergies = synFactors.get(band.getName());
         if (bandSynergies == null) {
-            throw new IncompatibleWorldException("Band name unknown to Bidder Setup ");
+            throw new IncompatibleWorldException("Band name unknown to SATSBidder Setup ");
         } else {
             return Collections.unmodifiableMap(bandSynergies);
         }

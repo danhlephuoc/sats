@@ -4,7 +4,7 @@ import org.spectrumauctions.sats.core.bidlang.generic.GenericDefinition;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericLang;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValue;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValueBidder;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSGood;
 import org.spectrumauctions.sats.core.util.random.RNGSupplier;
 import org.spectrumauctions.sats.core.util.random.UniformDistributionRNG;
 
@@ -14,7 +14,7 @@ import java.util.Map.Entry;
 /**
  * @author Fabio Isler
  */
-public abstract class XORQRandomOrderSimple<T extends GenericDefinition<S>, S extends Good> implements GenericLang<T, S> {
+public abstract class XORQRandomOrderSimple<T extends GenericDefinition<S>, S extends SATSGood> implements GenericLang<T, S> {
 
     private static final double MAX_POSSIBLE_BIDS_FACTOR = 0.8;
     private static final int ABSOLUTE_MAX_BIDS = 1000000;

@@ -5,6 +5,7 @@
  */
 package org.spectrumauctions.sats.opt.model.srvm;
 
+import ch.uzh.ifi.ce.domain.Bidder;
 import com.google.common.base.Preconditions;
 import edu.harvard.econcs.jopt.solver.IMIPResult;
 import edu.harvard.econcs.jopt.solver.SolveParam;
@@ -15,7 +16,7 @@ import edu.harvard.econcs.jopt.solver.mip.Variable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValue;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.Bundle;
 import org.spectrumauctions.sats.core.model.srvm.SRVMBand;
 import org.spectrumauctions.sats.core.model.srvm.SRVMBidder;
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
 /**
  * @author Fabio Isler
  */
-public class SRVM_MIP extends ModelMIP implements WinnerDeterminator<SRVMLicense> {
+public class SRVM_MIP extends ModelMIP {
 
     private static final Logger logger = LogManager.getLogger(SRVM_MIP.class);
 
@@ -55,19 +56,19 @@ public class SRVM_MIP extends ModelMIP implements WinnerDeterminator<SRVMLicense
         Preconditions.checkNotNull(bidders);
         Preconditions.checkArgument(bidders.size() > 0);
         world = bidders.iterator().next().getWorld();
-        getMip().setSolveParam(SolveParam.RELATIVE_OBJ_GAP, 0.001);
+        getMIP().setSolveParam(SolveParam.RELATIVE_OBJ_GAP, 0.001);
         double scalingFactor = calculateScalingFactor(bidders);
         double biggestPossibleValue = biggestUnscaledPossibleValue(bidders).doubleValue() / scalingFactor;
         this.worldPartialMip = new SRVMWorldPartialMip(
                 bidders,
                 biggestPossibleValue,
                 scalingFactor);
-        worldPartialMip.appendToMip(getMip());
+        worldPartialMip.appendToMip(getMIP());
         bidderPartialMips = new HashMap<>();
         for (SRVMBidder bidder : bidders) {
             SRVMBidderPartialMIP bidderPartialMIP;
             bidderPartialMIP = new SRVMBidderPartialMIP(bidder, worldPartialMip);
-            bidderPartialMIP.appendToMip(getMip());
+            bidderPartialMIP.appendToMip(getMIP());
             bidderPartialMips.put(bidder, bidderPartialMIP);
         }
     }
@@ -99,18 +100,19 @@ public class SRVM_MIP extends ModelMIP implements WinnerDeterminator<SRVMLicense
     }
 
     public void addConstraint(Constraint constraint) {
-        getMip().add(constraint);
+        getMIP().add(constraint);
     }
 
     public void addVariable(Variable variable) {
-        getMip().add(variable);
+        getMIP().add(variable);
     }
 
 
     @Override
-    public WinnerDeterminator<SRVMLicense> getWdWithoutBidder(Bidder<SRVMLicense> bidder) {
-        Preconditions.checkArgument(bidderPartialMips.containsKey(bidder));
-        return new SRVM_MIP(bidderPartialMips.keySet().stream().filter(b -> !b.equals(bidder)).collect(Collectors.toSet()));
+    public ModelMIP getMIPWithout(Bidder bidder) {
+        SRVMBidder srvmBidder = (SRVMBidder) bidder;
+        Preconditions.checkArgument(bidderPartialMips.containsKey(srvmBidder));
+        return new SRVM_MIP(bidderPartialMips.keySet().stream().filter(b -> !b.equals(srvmBidder)).collect(Collectors.toSet()));
     }
 
     /* (non-Javadoc)
@@ -118,7 +120,7 @@ public class SRVM_MIP extends ModelMIP implements WinnerDeterminator<SRVMLicense
      */
     @Override
     public SRVMMipResult calculateAllocation() {
-        IMIPResult mipResult = SOLVER.solve(getMip());
+        IMIPResult mipResult = SOLVER.solve(getMIP());
         if (PRINT_SOLVER_RESULT) {
             logger.info("Result:\n" + mipResult);
         }
@@ -147,13 +149,8 @@ public class SRVM_MIP extends ModelMIP implements WinnerDeterminator<SRVMLicense
     }
 
     @Override
-    public WinnerDeterminator<SRVMLicense> copyOf() {
+    public ModelMIP copyOf() {
         return new SRVM_MIP(bidderPartialMips.keySet());
-    }
-
-    @Override
-    public void adjustPayoffs(Map<Bidder<SRVMLicense>, Double> payoffs) {
-        throw new UnsupportedOperationException("The SRVM MIP does not support CCG yet.");
     }
 
     public SRVMWorldPartialMip getWorldPartialMip() {

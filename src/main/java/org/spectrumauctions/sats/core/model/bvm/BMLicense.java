@@ -5,7 +5,7 @@
  */
 package org.spectrumauctions.sats.core.model.bvm;
 
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSGood;
 import org.spectrumauctions.sats.core.model.IncompatibleWorldException;
 import org.spectrumauctions.sats.core.model.World;
 import org.spectrumauctions.sats.core.util.random.RNGSupplier;
@@ -14,7 +14,7 @@ import org.spectrumauctions.sats.core.util.random.RNGSupplier;
  * @author Michael Weiss
  *
  */
-public class BMLicense extends Good {
+public class BMLicense extends SATSGood {
 
     private static final long serialVersionUID = -597579273878128574L;
 
@@ -68,7 +68,7 @@ public class BMLicense extends Good {
 
 
     /* (non-Javadoc)
-     * @see Good#getWorld()
+     * @see SATSGood#getWorld()
      */
     @Override
     public BMWorld getWorld() {

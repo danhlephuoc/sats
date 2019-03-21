@@ -6,11 +6,11 @@
 package org.spectrumauctions.sats.core.bidlang.xor;
 
 import org.spectrumauctions.sats.core.model.Bundle;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSGood;
 
 import java.math.BigDecimal;
 
-public class XORValue<T extends Good> implements Comparable<XORValue<T>> {
+public class XORValue<T extends SATSGood> implements Comparable<XORValue<T>> {
 
     private transient final int id;
     private static int ID_COUNT = 0;

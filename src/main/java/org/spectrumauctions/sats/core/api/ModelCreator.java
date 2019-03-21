@@ -10,9 +10,9 @@ import org.spectrumauctions.sats.core.bidfile.FileWriter;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericDefinition;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericLang;
 import org.spectrumauctions.sats.core.bidlang.xor.XORLanguage;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.DefaultModel;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSGood;
 import org.spectrumauctions.sats.core.model.UnsupportedBiddingLanguageException;
 import org.spectrumauctions.sats.core.util.file.FilePathUtils;
 
@@ -86,7 +86,7 @@ public abstract class ModelCreator {
 
     protected PathResult appendTopLevelParamsAndSolve(DefaultModel<?, ?> model, File outputFolder) throws UnsupportedBiddingLanguageException, IOException, IllegalConfigException {
 
-        Collection<? extends Bidder<? extends Good>> bidders;
+        Collection<? extends SATSBidder<? extends SATSGood>> bidders;
         if (seedType == SeedType.INDIVIDUALSEED) {
             bidders = model.createNewPopulation(worldSeed, populationSeed);
         } else if (seedType == SeedType.NOSEED) {
@@ -103,10 +103,10 @@ public abstract class ModelCreator {
         PathResult result;
         if (generic) {
             @SuppressWarnings("unchecked")
-            Class<? extends GenericLang<GenericDefinition<? extends Good>, ?>> langClass = (Class<? extends GenericLang<GenericDefinition<? extends Good>, ?>>) BiddingLanguage.getXORQLanguage(lang);
+            Class<? extends GenericLang<GenericDefinition<? extends SATSGood>, ?>> langClass = (Class<? extends GenericLang<GenericDefinition<? extends SATSGood>, ?>>) BiddingLanguage.getXORQLanguage(lang);
             if (oneFile) {
-                Collection<GenericLang<GenericDefinition<? extends Good>, ?>> languages = new ArrayList<>();
-                for (Bidder<? extends Good> bidder : bidders) {
+                Collection<GenericLang<GenericDefinition<? extends SATSGood>, ?>> languages = new ArrayList<>();
+                for (SATSBidder<? extends SATSGood> bidder : bidders) {
                     languages.add(bidder.getValueFunction(langClass));
                 }
                 File valueFile = writer.writeMultiBidderXORQ(languages, bidsPerBidder, "satsvalue");
@@ -114,12 +114,12 @@ public abstract class ModelCreator {
                 result.addValueFile(valueFile);
                 return result;
             } else {
-                Collection<GenericLang<GenericDefinition<? extends Good>, ?>> languages = new ArrayList<>();
+                Collection<GenericLang<GenericDefinition<? extends SATSGood>, ?>> languages = new ArrayList<>();
                 String zipId = String.valueOf(new Date().getTime());
                 File folder = new File(writer.getFolder().getAbsolutePath().concat(File.separator).concat(zipId));
                 folder.mkdir();
-                for (Bidder<? extends Good> bidder : bidders) {
-                    GenericLang<GenericDefinition<? extends Good>, ?> valueFunction = bidder.getValueFunction(langClass);
+                for (SATSBidder<? extends SATSGood> bidder : bidders) {
+                    GenericLang<GenericDefinition<? extends SATSGood>, ?> valueFunction = bidder.getValueFunction(langClass);
                     writer.writeSingleBidderXORQ(valueFunction, bidsPerBidder, zipId.concat(File.separator).concat("satsvalue"));
                 }
                 result = new PathResult(storeWorldSerialization, instanceFolder);
@@ -128,11 +128,11 @@ public abstract class ModelCreator {
             }
         } else {
             @SuppressWarnings("unchecked")
-            Class<? extends XORLanguage<Good>> langClass = (Class<? extends XORLanguage<Good>>) BiddingLanguage.getXORLanguage(lang);
+            Class<? extends XORLanguage<SATSGood>> langClass = (Class<? extends XORLanguage<SATSGood>>) BiddingLanguage.getXORLanguage(lang);
             if (oneFile) {
-                Collection<XORLanguage<? extends Good>> languages = new ArrayList<>();
-                for (Bidder<? extends Good> bidder : bidders) {
-                    XORLanguage<Good> language = bidder.getValueFunction(langClass);
+                Collection<XORLanguage<? extends SATSGood>> languages = new ArrayList<>();
+                for (SATSBidder<? extends SATSGood> bidder : bidders) {
+                    XORLanguage<SATSGood> language = bidder.getValueFunction(langClass);
                     languages.add(language);
                 }
                 File valueFile = writer.writeMultiBidderXOR(languages, bidsPerBidder, "satsvalue");
@@ -143,8 +143,8 @@ public abstract class ModelCreator {
                 String zipId = String.valueOf(new Date().getTime());
                 File folder = new File(writer.getFolder().getAbsolutePath().concat(File.separator).concat(zipId));
                 folder.mkdir();
-                for (Bidder<? extends Good> bidder : bidders) {
-                    XORLanguage<Good> language = bidder.getValueFunction(langClass);
+                for (SATSBidder<? extends SATSGood> bidder : bidders) {
+                    XORLanguage<SATSGood> language = bidder.getValueFunction(langClass);
                     writer.writeSingleBidderXOR(language, bidsPerBidder, zipId.concat(File.separator).concat("satsvalue"));
                 }
                 result = new PathResult(storeWorldSerialization, instanceFolder);

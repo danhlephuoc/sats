@@ -124,7 +124,7 @@ public class SRVMBidderTest {
 
         SRVMBidderSetup.PrimaryBidderBuilder BidderBuilder = new SRVMBidderSetup.PrimaryBidderBuilder();
         BidderBuilder.setNumberOfBidders(numberOfBidders);
-        BidderBuilder.setSetupName("Test SRVM Bidder");
+        BidderBuilder.setSetupName("Test SRVM SATSBidder");
 
         List<SRVMBidderSetup> regionalSetups = new ArrayList<>();
         regionalSetups.add(BidderBuilder.build());

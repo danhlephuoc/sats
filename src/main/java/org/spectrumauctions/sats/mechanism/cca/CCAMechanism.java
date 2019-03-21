@@ -2,19 +2,19 @@ package org.spectrumauctions.sats.mechanism.cca;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.spectrumauctions.sats.core.model.Bidder;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSBidder;
+import org.spectrumauctions.sats.core.model.SATSGood;
 import org.spectrumauctions.sats.mechanism.PaymentRuleEnum;
 import org.spectrumauctions.sats.mechanism.domain.MechanismResult;
 import org.spectrumauctions.sats.mechanism.domain.Payment;
 import org.spectrumauctions.sats.mechanism.domain.mechanisms.AuctionMechanism;
-import org.spectrumauctions.sats.opt.domain.Allocation;
+import org.spectrumauctions.sats.opt.domain.SATSAllocation;
 import org.spectrumauctions.sats.opt.domain.WinnerDeterminator;
 
 import java.math.BigDecimal;
 import java.util.*;
 
-public abstract class CCAMechanism<T extends Good> implements AuctionMechanism<T> {
+public abstract class CCAMechanism<T extends SATSGood> implements AuctionMechanism<T> {
 
     private static final Logger logger = LogManager.getLogger(CCAMechanism.class);
 
@@ -26,7 +26,7 @@ public abstract class CCAMechanism<T extends Good> implements AuctionMechanism<T
     private static final int DEFAULT_ABS_RESULT_POOL_TOLERANCE = 0;
     private static final int DEFAULT_CLOCKPHASE_NUMBER_OF_BUNDLES = 1;
 
-    protected List<Bidder<T>> bidders;
+    protected List<SATSBidder<T>> bidders;
     protected int totalRounds = 1;
     protected BigDecimal fallbackStartingPrice = DEFAULT_STARTING_PRICE;
     protected double epsilon = DEFAULT_EPSILON;
@@ -43,7 +43,7 @@ public abstract class CCAMechanism<T extends Good> implements AuctionMechanism<T
     protected MechanismResult<T> result;
 
 
-    public CCAMechanism(List<Bidder<T>> bidders) {
+    public CCAMechanism(List<SATSBidder<T>> bidders) {
         this.bidders = bidders;
     }
 
@@ -60,12 +60,12 @@ public abstract class CCAMechanism<T extends Good> implements AuctionMechanism<T
     }
 
     @Override
-    public WinnerDeterminator<T> getWdWithoutBidder(Bidder<T> bidder) {
+    public WinnerDeterminator<T> getWdWithoutBidder(SATSBidder<T> bidder) {
         throw new UnsupportedOperationException("Not supported"); // FIXME: Clean up interfaces
     }
 
     @Override
-    public Allocation<T> calculateAllocation() {
+    public SATSAllocation<T> calculateAllocation() {
         return getMechanismResult().getAllocation();
     }
 
@@ -75,7 +75,7 @@ public abstract class CCAMechanism<T extends Good> implements AuctionMechanism<T
     }
 
     @Override
-    public void adjustPayoffs(Map<Bidder<T>, Double> payoffs) {
+    public void adjustPayoffs(Map<SATSBidder<T>, Double> payoffs) {
         throw new UnsupportedOperationException("Not supported"); // FIXME: Clean up interfaces
     }
 

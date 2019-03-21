@@ -7,14 +7,13 @@ package org.spectrumauctions.sats.opt.model.srvm;
 
 import edu.harvard.econcs.jopt.solver.IMIPResult;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValue;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.srvm.SRVMBand;
 import org.spectrumauctions.sats.core.model.srvm.SRVMBidder;
 import org.spectrumauctions.sats.core.model.srvm.SRVMLicense;
 import org.spectrumauctions.sats.core.model.srvm.SRVMWorld;
-import org.spectrumauctions.sats.opt.domain.GenericAllocation;
+import org.spectrumauctions.sats.opt.domain.GenericSATSAllocation;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -24,7 +23,7 @@ import java.util.Map.Entry;
 /**
  * @author Michael Weiss
  */
-public final class SRVMMipResult extends GenericAllocation<SRVMBand, SRVMLicense> {
+public final class SRVMMipResult extends GenericSATSAllocation<SRVMBand, SRVMLicense> {
 
 
     private final SRVMWorld world;
@@ -50,15 +49,15 @@ public final class SRVMMipResult extends GenericAllocation<SRVMBand, SRVMLicense
         String tab = "\t";
         StringBuilder builder = new StringBuilder();
 
-        List<Entry<Bidder<SRVMLicense>, GenericValue<SRVMBand, SRVMLicense>>> sortedEntries = new ArrayList<>(values.entrySet());
-        Collections.sort(sortedEntries, Comparator.comparing(e -> ((Long) e.getKey().getId())));
+        List<Entry<SATSBidder<SRVMLicense>, GenericValue<SRVMBand, SRVMLicense>>> sortedEntries = new ArrayList<>(values.entrySet());
+        Collections.sort(sortedEntries, Comparator.comparing(e -> ((Long) e.getKey().getLongId())));
 
 
         builder.append("===== bidder listing =======").append(System.lineSeparator());
-        for (Entry<Bidder<SRVMLicense>, GenericValue<SRVMBand, SRVMLicense>> entry : sortedEntries) {
+        for (Entry<SATSBidder<SRVMLicense>, GenericValue<SRVMBand, SRVMLicense>> entry : sortedEntries) {
             SRVMBidder bidder = (SRVMBidder) entry.getKey();
 
-            builder.append(entry.getKey().getId())
+            builder.append(entry.getKey().getLongId())
                     .append(tab)
                     .append(entry.getKey().getClass().getSimpleName())
                     .append("(")
@@ -82,11 +81,11 @@ public final class SRVMMipResult extends GenericAllocation<SRVMBand, SRVMLicense
             }
             builder.append(System.lineSeparator());
             //Print allocation in reguin
-            for (Entry<Bidder<SRVMLicense>, GenericValue<SRVMBand, SRVMLicense>> entry : sortedEntries) {
+            for (Entry<SATSBidder<SRVMLicense>, GenericValue<SRVMBand, SRVMLicense>> entry : sortedEntries) {
                 builder.append(tab);
                 for (SRVMBand band : orderedBands) {
                     int quantity = entry.getValue().getQuantity(band);
-//                        builder.append(entry.getKey().getId())
+//                        builder.append(entry.getKey().getLongId())
 //                        .append(":")
                     builder.append(quantity)
                             .append(tab)
@@ -95,7 +94,7 @@ public final class SRVMMipResult extends GenericAllocation<SRVMBand, SRVMLicense
                 }
                 SRVMBidder bidder = (SRVMBidder) entry.getKey();
                 builder.append(entry.getKey().getClass().getSimpleName())
-                        .append(entry.getKey().getId())
+                        .append(entry.getKey().getLongId())
                         .append(" (")
                         .append(bidder.getSetupType())
                         .append(")");
@@ -105,7 +104,7 @@ public final class SRVMMipResult extends GenericAllocation<SRVMBand, SRVMLicense
         return builder.toString();
     }
 
-    public static final class Builder extends GenericAllocation.Builder<SRVMBand, SRVMLicense> {
+    public static final class Builder extends GenericSATSAllocation.Builder<SRVMBand, SRVMLicense> {
 
         private SRVMWorld world;
         private final IMIPResult joptResult;

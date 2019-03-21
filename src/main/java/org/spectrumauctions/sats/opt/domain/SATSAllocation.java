@@ -5,9 +5,9 @@
  */
 package org.spectrumauctions.sats.opt.domain;
 
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.Bundle;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSGood;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -16,18 +16,19 @@ import java.util.Collection;
  * @author Michael Weiss
  *
  */
-public interface Allocation<T extends Good> {
+// TODO: Align with mechanism library's Allocation
+public interface SATSAllocation<T extends SATSGood> {
 
-    Collection<Bidder<T>> getWinners();
+    Collection<SATSBidder<T>> getWinners();
 
     /**
      * Returns information about the goods allocated to a specific bidder
      */
-    Bundle<T> getAllocation(Bidder<T> bidder);
+    Bundle<T> getAllocation(SATSBidder<T> bidder);
 
     BigDecimal getTotalValue();
 
-    BigDecimal getTradeValue(Bidder<T> bidder);
+    BigDecimal getTradeValue(SATSBidder<T> bidder);
 
-    Allocation<T> getAllocationWithTrueValues();
+    SATSAllocation<T> getAllocationWithTrueValues();
 }

@@ -10,6 +10,7 @@ import org.spectrumauctions.sats.core.model.srvm.SingleRegionModel;
 import org.spectrumauctions.sats.mechanism.domain.Payment;
 import org.spectrumauctions.sats.mechanism.domain.mechanisms.AuctionMechanism;
 import org.spectrumauctions.sats.opt.domain.WinnerDeterminator;
+import org.spectrumauctions.sats.opt.model.ModelMIP;
 import org.spectrumauctions.sats.opt.model.lsvm.LSVMStandardMIP;
 import org.spectrumauctions.sats.opt.model.srvm.SRVM_MIP;
 
@@ -21,12 +22,13 @@ public class VCGWithLSVMTest {
 
     @Test
     public void testVCGWithStandardLSVM() {
+        // FIXME: runs 14 instead of 7 times
         List<LSVMBidder> bidders = new LocalSynergyValueModel().createNewPopulation(2345567);
-        WinnerDeterminator<LSVMLicense> wdp = new LSVMStandardMIP(bidders);
-        AuctionMechanism<LSVMLicense> am = new VCGMechanism<>(wdp);
-        Payment<LSVMLicense> payment = am.getPayment();
-        double totalValue = am.getMechanismResult().getAllocation().getTotalValue().doubleValue();
-        double sumOfValues = bidders.stream().mapToDouble(b -> am.getMechanismResult().getAllocation().getTradeValue(b).doubleValue()).sum();
+        ModelMIP wdp = new LSVMStandardMIP(bidders);
+        ch.uzh.ifi.ce.mechanisms.AuctionMechanism am = new ModelVCGMechanism(wdp);
+        ch.uzh.ifi.ce.domain.Payment payment = am.getPayment();
+        double totalValue = am.getAllocation().getTotalAllocationValue().doubleValue();
+        double sumOfValues = bidders.stream().mapToDouble(b -> am.getAllocation().getTradesMap().get(b).getValue().doubleValue()).sum();
         assertEquals(totalValue, sumOfValues, 1e-6);
         assertEquals(568.2216513366325, totalValue, 1e-6);
     }

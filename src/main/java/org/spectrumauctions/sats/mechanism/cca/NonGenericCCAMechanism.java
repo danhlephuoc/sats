@@ -18,7 +18,7 @@ import org.spectrumauctions.sats.mechanism.ccg.CCGMechanism;
 import org.spectrumauctions.sats.mechanism.domain.MechanismResult;
 import org.spectrumauctions.sats.mechanism.domain.mechanisms.AuctionMechanism;
 import org.spectrumauctions.sats.mechanism.vcg.VCGMechanism;
-import org.spectrumauctions.sats.opt.domain.Allocation;
+import org.spectrumauctions.sats.opt.domain.SATSAllocation;
 import org.spectrumauctions.sats.opt.domain.NonGenericDemandQueryMIP;
 import org.spectrumauctions.sats.opt.domain.NonGenericDemandQueryMIPBuilder;
 import org.spectrumauctions.sats.opt.domain.NonGenericDemandQueryResult;
@@ -28,12 +28,12 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class NonGenericCCAMechanism<T extends Good> extends CCAMechanism<T> {
+public class NonGenericCCAMechanism<T extends SATSGood> extends CCAMechanism<T> {
 
     private static final Logger logger = LogManager.getLogger(NonGenericCCAMechanism.class);
 
     private NonGenericDemandQueryMIPBuilder<T> demandQueryMIPBuilder;
-    private Map<Good, BigDecimal> startingPrices = new HashMap<>();
+    private Map<SATSGood, BigDecimal> startingPrices = new HashMap<>();
     private NonGenericPriceUpdater<T> priceUpdater = new SimpleRelativeNonGenericPriceUpdate<>();
     private List<NonGenericSupplementaryRound<T>> supplementaryRounds = new ArrayList<>();
 
@@ -43,7 +43,7 @@ public class NonGenericCCAMechanism<T extends Good> extends CCAMechanism<T> {
     private Map<T, BigDecimal> finalPrices;
     private Map<T, Integer> finalDemand;
 
-    public NonGenericCCAMechanism(List<Bidder<T>> bidders, NonGenericDemandQueryMIPBuilder<T> nonGenericDemandQueryMIPBuilder) {
+    public NonGenericCCAMechanism(List<SATSBidder<T>> bidders, NonGenericDemandQueryMIPBuilder<T> nonGenericDemandQueryMIPBuilder) {
         super(bidders);
         this.demandQueryMIPBuilder = nonGenericDemandQueryMIPBuilder;
     }
@@ -64,23 +64,23 @@ public class NonGenericCCAMechanism<T extends Good> extends CCAMechanism<T> {
         return result;
     }
 
-    public void setStartingPrice(Good good, BigDecimal price) {
+    public void setStartingPrice(SATSGood good, BigDecimal price) {
         startingPrices.put(good, price);
     }
 
     @Override
     public void calculateSampledStartingPrices(int bidsPerBidder, int numberOfWorldSamples, double fraction, long seed) {
-        World world = bidders.stream().findAny().map(Bidder::getWorld).orElseThrow(NoSuchFieldError::new);
+        World world = bidders.stream().findAny().map(SATSBidder::getWorld).orElseThrow(NoSuchFieldError::new);
         // We need a fixed order -> List
-        List<Good> licenseList = new ArrayList<>(world.getLicenses());
+        List<SATSGood> licenseList = new ArrayList<>(world.getLicenses());
         try {
             ArrayList<Double> yVector = new ArrayList<>();
             ArrayList<ArrayList<Double>> xVectors = new ArrayList<>();
 
             RNGSupplier rngSupplier = new JavaUtilRNGSupplier(seed);
             for (int i = 0; i < numberOfWorldSamples; i++) {
-                List<Bidder<T>> alternateBidders = bidders.stream().map(b -> b.drawSimilarBidder(rngSupplier)).collect(Collectors.toList());
-                for (Bidder<T> bidder : alternateBidders) {
+                List<SATSBidder<T>> alternateBidders = bidders.stream().map(b -> b.drawSimilarBidder(rngSupplier)).collect(Collectors.toList());
+                for (SATSBidder<T> bidder : alternateBidders) {
                     SizeBasedUniqueRandomXOR valueFunction;
 
                     valueFunction = bidder.getValueFunction(SizeBasedUniqueRandomXOR.class, rngSupplier);
@@ -91,7 +91,7 @@ public class NonGenericCCAMechanism<T extends Good> extends CCAMechanism<T> {
                         XORValue<T> bid = bidIterator.next();
                         yVector.add(bid.value().doubleValue());
                         ArrayList<Double> xVector = new ArrayList<>();
-                        for (Good license : licenseList) {
+                        for (SATSGood license : licenseList) {
                             double value = 0;
                             if (bid.getLicenses().contains(license)) {
                                 value = 1;
@@ -136,7 +136,7 @@ public class NonGenericCCAMechanism<T extends Good> extends CCAMechanism<T> {
         }
     }
 
-    public Allocation<T> calculateClockPhaseAllocation() {
+    public SATSAllocation<T> calculateClockPhaseAllocation() {
         if (bidsAfterClockPhase == null) {
             logger.info("Starting clock phase for XOR bids...");
             bidsAfterClockPhase = runClockPhase();
@@ -147,7 +147,7 @@ public class NonGenericCCAMechanism<T extends Good> extends CCAMechanism<T> {
         return wdp.calculateAllocation();
     }
 
-    public Allocation<T> calculateAllocationAfterSupplementaryRound() {
+    public SATSAllocation<T> calculateAllocationAfterSupplementaryRound() {
         if (bidsAfterClockPhase == null) {
             logger.info("Starting clock phase for XOR bids...");
             bidsAfterClockPhase = runClockPhase();
@@ -163,10 +163,10 @@ public class NonGenericCCAMechanism<T extends Good> extends CCAMechanism<T> {
     }
 
     private Collection<XORBid<T>> runClockPhase() {
-        Map<Bidder<T>, XORBid<T>> bids = new HashMap<>();
+        Map<SATSBidder<T>, XORBid<T>> bids = new HashMap<>();
         bidders.forEach(bidder -> bids.put(bidder, new XORBid.Builder<>(bidder).build()));
         Map<T, BigDecimal> prices = new HashMap<>();
-        for (Good good : bidders.stream().findFirst().orElseThrow(IncompatibleWorldException::new).getWorld().getLicenses()) {
+        for (SATSGood good : bidders.stream().findFirst().orElseThrow(IncompatibleWorldException::new).getWorld().getLicenses()) {
             prices.put((T) good, startingPrices.getOrDefault(good, fallbackStartingPrice));
         }
 
@@ -176,7 +176,7 @@ public class NonGenericCCAMechanism<T extends Good> extends CCAMechanism<T> {
             Map<T, BigDecimal> currentPrices = prices; // For lambda use
             demand = new HashMap<>();
 
-            for (Bidder<T> bidder : bidders) {
+            for (SATSBidder<T> bidder : bidders) {
                 NonGenericDemandQueryMIP<T> demandQueryMIP = demandQueryMIPBuilder.getDemandQueryMipFor(bidder, prices, epsilon);
                 demandQueryMIP.setTimeLimit(getTimeLimit());
                 List<? extends NonGenericDemandQueryResult<T>> demandQueryResults = demandQueryMIP.getResultPool(clockPhaseNumberOfBundles);
@@ -224,7 +224,7 @@ public class NonGenericCCAMechanism<T extends Good> extends CCAMechanism<T> {
         if (supplementaryRounds.isEmpty())
             supplementaryRounds.add(new ProfitMaximizingNonGenericSupplementaryRound<>());
 
-        for (Bidder<T> bidder : bidders) {
+        for (SATSBidder<T> bidder : bidders) {
             List<XORValue<T>> newValues = new ArrayList<>();
             for (NonGenericSupplementaryRound<T> supplementaryRound : supplementaryRounds) {
                 newValues.addAll(supplementaryRound.getSupplementaryBids(this, bidder));
@@ -286,8 +286,8 @@ public class NonGenericCCAMechanism<T extends Good> extends CCAMechanism<T> {
         return bidsAfterSupplementaryRound;
     }
 
-    public Map<Bidder<T>, Integer> getXORBidsCount() {
-        Map<Bidder<T>, Integer> map = new HashMap<>();
+    public Map<SATSBidder<T>, Integer> getXORBidsCount() {
+        Map<SATSBidder<T>, Integer> map = new HashMap<>();
         bidsAfterClockPhase.forEach(bid -> map.put(bid.getBidder(), bid.getValues().size()));
         return map;
     }
@@ -302,14 +302,14 @@ public class NonGenericCCAMechanism<T extends Good> extends CCAMechanism<T> {
         this.supplementaryRounds.add(nonGenericSupplementaryRound);
     }
 
-    public Map<Bidder<T>, Integer> getBidCountAfterClockPhase() {
-        Map<Bidder<T>, Integer> map = new HashMap<>();
+    public Map<SATSBidder<T>, Integer> getBidCountAfterClockPhase() {
+        Map<SATSBidder<T>, Integer> map = new HashMap<>();
         bidsAfterClockPhase.forEach(bid -> map.put(bid.getBidder(), bid.getValues().size()));
         return map;
     }
 
-    public Map<Bidder<T>, Integer> getBidCountAfterSupplementaryRound() {
-        Map<Bidder<T>, Integer> map = new HashMap<>();
+    public Map<SATSBidder<T>, Integer> getBidCountAfterSupplementaryRound() {
+        Map<SATSBidder<T>, Integer> map = new HashMap<>();
         bidsAfterSupplementaryRound.forEach(bid -> map.put(bid.getBidder(), bid.getValues().size()));
         return map;
     }
@@ -326,7 +326,7 @@ public class NonGenericCCAMechanism<T extends Good> extends CCAMechanism<T> {
         return priceUpdater.getLastPrices();
     }
 
-    public XORBid<T> getBidAfterClockPhase(Bidder<T> bidder) {
+    public XORBid<T> getBidAfterClockPhase(SATSBidder<T> bidder) {
         for (XORBid<T> bid : bidsAfterClockPhase) {
             if (bid.getBidder().equals(bidder)) return bid;
         }
@@ -335,7 +335,7 @@ public class NonGenericCCAMechanism<T extends Good> extends CCAMechanism<T> {
     }
 
 
-    public XORBid<T> getBidAfterSupplementaryRound(Bidder<T> bidder) {
+    public XORBid<T> getBidAfterSupplementaryRound(SATSBidder<T> bidder) {
         for (XORBid<T> bid : bidsAfterSupplementaryRound) {
             if (bid.getBidder().equals(bidder)) return bid;
         }

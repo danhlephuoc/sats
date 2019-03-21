@@ -9,7 +9,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.spectrumauctions.sats.core.bidlang.generic.Band;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericDefinition;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSGood;
 import org.spectrumauctions.sats.core.model.IncompatibleWorldException;
 import org.spectrumauctions.sats.core.model.World;
 import org.spectrumauctions.sats.core.util.random.RNGSupplier;
@@ -111,7 +111,7 @@ public class BMBand extends Band implements GenericDefinition<BMLicense>, Serial
     }
 
     /**
-     * @see GenericDefinition#isPartOf(Good)
+     * @see GenericDefinition#isPartOf(SATSGood)
      */
     @Override
     public boolean isPartOf(BMLicense license) {

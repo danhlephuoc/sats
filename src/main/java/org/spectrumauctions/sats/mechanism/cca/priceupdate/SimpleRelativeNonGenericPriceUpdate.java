@@ -1,12 +1,12 @@
 package org.spectrumauctions.sats.mechanism.cca.priceupdate;
 
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSGood;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SimpleRelativeNonGenericPriceUpdate<T extends Good> implements NonGenericPriceUpdater<T> {
+public class SimpleRelativeNonGenericPriceUpdate<T extends SATSGood> implements NonGenericPriceUpdater<T> {
 
     private static final BigDecimal DEFAULT_PRICE_UPDATE = BigDecimal.valueOf(0.1);
     private static final BigDecimal DEFAULT_INITIAL_UPDATE = BigDecimal.valueOf(1e5);

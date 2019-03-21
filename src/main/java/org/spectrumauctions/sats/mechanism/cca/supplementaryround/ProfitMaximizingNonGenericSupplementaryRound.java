@@ -2,8 +2,8 @@ package org.spectrumauctions.sats.mechanism.cca.supplementaryround;
 
 import com.google.common.base.Preconditions;
 import org.spectrumauctions.sats.core.bidlang.xor.XORValue;
-import org.spectrumauctions.sats.core.model.Bidder;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSBidder;
+import org.spectrumauctions.sats.core.model.SATSGood;
 import org.spectrumauctions.sats.mechanism.cca.NonGenericCCAMechanism;
 import org.spectrumauctions.sats.opt.domain.NonGenericDemandQueryMIP;
 import org.spectrumauctions.sats.opt.domain.NonGenericDemandQueryMIPBuilder;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ProfitMaximizingNonGenericSupplementaryRound<T extends Good> implements NonGenericSupplementaryRound<T> {
+public class ProfitMaximizingNonGenericSupplementaryRound<T extends SATSGood> implements NonGenericSupplementaryRound<T> {
 
     private static final int DEFAULT_NUMBER_OF_SUPPLEMENTARY_BIDS = 500;
 
@@ -24,7 +24,7 @@ public class ProfitMaximizingNonGenericSupplementaryRound<T extends Good> implem
     private boolean useZeroPrices = false;
 
     @Override
-    public List<XORValue<T>> getSupplementaryBids(NonGenericCCAMechanism<T> cca, Bidder<T> bidder) {
+    public List<XORValue<T>> getSupplementaryBids(NonGenericCCAMechanism<T> cca, SATSBidder<T> bidder) {
         Preconditions.checkArgument(!(useLastDemandedPrices && useZeroPrices));
         NonGenericDemandQueryMIPBuilder<T> nonGenericDemandQueryMipBuilder = cca.getDemandQueryBuilder();
         Map<T, BigDecimal> finalPrices = cca.getFinalPrices();

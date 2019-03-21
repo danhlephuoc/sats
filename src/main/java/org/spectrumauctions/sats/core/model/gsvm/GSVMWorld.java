@@ -2,7 +2,7 @@ package org.spectrumauctions.sats.core.model.gsvm;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.World;
 import org.spectrumauctions.sats.core.util.random.RNGSupplier;
 import org.spectrumauctions.sats.core.util.random.UniformDistributionRNG;
@@ -46,7 +46,7 @@ public final class GSVMWorld extends World {
     }
 
     @Override
-    public Collection<? extends Bidder<GSVMLicense>> restorePopulation(long populationId) {
+    public Collection<? extends SATSBidder<GSVMLicense>> restorePopulation(long populationId) {
         return super.restorePopulation(GSVMBidder.class, populationId);
     }
 

@@ -9,22 +9,22 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class ItemAllocation<T extends Good> implements Allocation<T> {
+public final class ItemSATSAllocation<T extends SATSGood> implements SATSAllocation<T> {
 
-    private static final Logger logger = LogManager.getLogger(ItemAllocation.class);
+    private static final Logger logger = LogManager.getLogger(ItemSATSAllocation.class);
 
     private final World world;
-    private final Map<Bidder<T>, Bundle<T>> alloc;
-    private final Map<Bidder<T>, BigDecimal> declaredValues;
+    private final Map<SATSBidder<T>, Bundle<T>> alloc;
+    private final Map<SATSBidder<T>, BigDecimal> declaredValues;
 
     private final BigDecimal totalValue;
 
-    private ItemAllocation(ItemAllocationBuilder<T> builder) {
+    private ItemSATSAllocation(ItemAllocationBuilder<T> builder) {
         this.world = builder.world;
         this.alloc = builder.alloc;
         if (builder.declaredValues == null) {
             declaredValues = new HashMap<>();
-            for (Map.Entry<Bidder<T>, Bundle<T>> entry : alloc.entrySet()) {
+            for (Map.Entry<SATSBidder<T>, Bundle<T>> entry : alloc.entrySet()) {
                 declaredValues.put(entry.getKey(), entry.getKey().calculateValue(entry.getValue()));
             }
         } else {
@@ -38,12 +38,12 @@ public final class ItemAllocation<T extends Good> implements Allocation<T> {
     }
 
     @Override
-    public Collection<Bidder<T>> getWinners() {
+    public Collection<SATSBidder<T>> getWinners() {
         return alloc.keySet();
     }
 
     @Override
-    public Bundle<T> getAllocation(Bidder<T> bidder) {
+    public Bundle<T> getAllocation(SATSBidder<T> bidder) {
         Bundle<T> candidate = alloc.get(bidder);
         if (candidate == null) {
             if (bidder.getWorld().equals(world)) {
@@ -62,12 +62,12 @@ public final class ItemAllocation<T extends Good> implements Allocation<T> {
     }
 
     @Override
-    public BigDecimal getTradeValue(Bidder<T> bidder) {
+    public BigDecimal getTradeValue(SATSBidder<T> bidder) {
         return declaredValues.getOrDefault(bidder, BigDecimal.ZERO);
     }
 
     @Override
-    public Allocation<T> getAllocationWithTrueValues() {
+    public SATSAllocation<T> getAllocationWithTrueValues() {
         ItemAllocationBuilder<T> builder = new ItemAllocationBuilder<>();
         return builder
                 .withAllocation(alloc)
@@ -80,7 +80,7 @@ public final class ItemAllocation<T extends Good> implements Allocation<T> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ItemAllocation<?> that = (ItemAllocation<?>) o;
+        ItemSATSAllocation<?> that = (ItemSATSAllocation<?>) o;
 
         if (world != null ? !world.equals(that.world) : that.world != null) return false;
         if (alloc != null ? !alloc.equals(that.alloc) : that.alloc != null) return false;
@@ -101,37 +101,37 @@ public final class ItemAllocation<T extends Good> implements Allocation<T> {
     @Override
     public String toString() {
         StringBuilder allocation = new StringBuilder("[");
-        for (Map.Entry<Bidder<T>, Bundle<T>> entry : alloc.entrySet()) {
+        for (Map.Entry<SATSBidder<T>, Bundle<T>> entry : alloc.entrySet()) {
             if (!entry.getValue().isEmpty()) {
                 allocation.append(entry.getKey().getSetupType()).append(": ").append(entry.getValue().itemIds(",")).append(";    ");
             }
         }
         allocation.append("]");
         StringBuilder values = new StringBuilder("[");
-        for (Map.Entry<Bidder<T>, BigDecimal> entry : declaredValues.entrySet()) {
+        for (Map.Entry<SATSBidder<T>, BigDecimal> entry : declaredValues.entrySet()) {
             values.append(entry.getKey().getSetupType()).append(": ").append(entry.getValue()).append(";    ");
         }
         values.append("]");
-        return "ItemAllocation{" +
+        return "ItemSATSAllocation{" +
                 "alloc=" + allocation.toString() +
                 ", declaredValues=" + values.toString() +
                 ", totalValue=" + totalValue +
                 '}';
     }
 
-    public static final class ItemAllocationBuilder<T extends Good> {
+    public static final class ItemAllocationBuilder<T extends SATSGood> {
 
         private World world;
-        private Map<Bidder<T>, Bundle<T>> alloc;
+        private Map<SATSBidder<T>, Bundle<T>> alloc;
         private BigDecimal totalValue;
-        private Map<Bidder<T>, BigDecimal> declaredValues;
+        private Map<SATSBidder<T>, BigDecimal> declaredValues;
 
         public ItemAllocationBuilder<T> withWorld(World world) {
             setWorld(world);
             return this;
         }
 
-        public ItemAllocationBuilder<T> withAllocation(Map<Bidder<T>, Bundle<T>> alloc) {
+        public ItemAllocationBuilder<T> withAllocation(Map<SATSBidder<T>, Bundle<T>> alloc) {
             setAlloc(alloc);
             return this;
         }
@@ -141,21 +141,21 @@ public final class ItemAllocation<T extends Good> implements Allocation<T> {
             return this;
         }
 
-        public ItemAllocationBuilder<T> withDeclaredValues(Map<Bidder<T>, BigDecimal> declaredValues) {
+        public ItemAllocationBuilder<T> withDeclaredValues(Map<SATSBidder<T>, BigDecimal> declaredValues) {
             setDeclaredValues(declaredValues);
             return this;
         }
 
 
-        public ItemAllocation<T> build() {
-            return new ItemAllocation<>(this);
+        public ItemSATSAllocation<T> build() {
+            return new ItemSATSAllocation<>(this);
         }
 
         private void setWorld(World world) {
             this.world = world;
         }
 
-        private void setAlloc(Map<Bidder<T>, Bundle<T>> alloc) {
+        private void setAlloc(Map<SATSBidder<T>, Bundle<T>> alloc) {
             this.alloc = alloc;
         }
 
@@ -163,7 +163,7 @@ public final class ItemAllocation<T extends Good> implements Allocation<T> {
             this.totalValue = totalValue;
         }
 
-        public void setDeclaredValues(Map<Bidder<T>, BigDecimal> declaredValues) {
+        public void setDeclaredValues(Map<SATSBidder<T>, BigDecimal> declaredValues) {
             this.declaredValues = declaredValues;
         }
     }

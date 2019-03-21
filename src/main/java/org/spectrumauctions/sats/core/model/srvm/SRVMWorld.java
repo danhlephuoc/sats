@@ -6,7 +6,7 @@
 package org.spectrumauctions.sats.core.model.srvm;
 
 import com.google.common.collect.ImmutableSet;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.World;
 import org.spectrumauctions.sats.core.util.random.RNGSupplier;
 
@@ -83,7 +83,7 @@ public final class SRVMWorld extends World {
      * @see World#restorePopulation(long)
      */
     @Override
-    public Collection<? extends Bidder<SRVMLicense>> restorePopulation(long populationId) {
+    public Collection<? extends SATSBidder<SRVMLicense>> restorePopulation(long populationId) {
         return super.restorePopulation(SRVMBidder.class, populationId);
     }
 

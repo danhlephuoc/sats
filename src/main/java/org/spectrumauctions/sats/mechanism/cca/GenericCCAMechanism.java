@@ -19,7 +19,7 @@ import org.spectrumauctions.sats.mechanism.ccg.CCGMechanism;
 import org.spectrumauctions.sats.mechanism.domain.MechanismResult;
 import org.spectrumauctions.sats.mechanism.domain.mechanisms.AuctionMechanism;
 import org.spectrumauctions.sats.mechanism.vcg.VCGMechanism;
-import org.spectrumauctions.sats.opt.domain.Allocation;
+import org.spectrumauctions.sats.opt.domain.SATSAllocation;
 import org.spectrumauctions.sats.opt.domain.GenericDemandQueryMIP;
 import org.spectrumauctions.sats.opt.domain.GenericDemandQueryMIPBuilder;
 import org.spectrumauctions.sats.opt.domain.GenericDemandQueryResult;
@@ -29,7 +29,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class GenericCCAMechanism<G extends GenericDefinition<T>, T extends Good> extends CCAMechanism<T> {
+public class GenericCCAMechanism<G extends GenericDefinition<T>, T extends SATSGood> extends CCAMechanism<T> {
 
     private static final Logger logger = LogManager.getLogger(GenericCCAMechanism.class);
 
@@ -45,7 +45,7 @@ public class GenericCCAMechanism<G extends GenericDefinition<T>, T extends Good>
     private List<GenericSupplementaryRound<G, T>> supplementaryRounds = new ArrayList<>();
 
 
-    public GenericCCAMechanism(List<Bidder<T>> bidders, GenericDemandQueryMIPBuilder<G, T> genericDemandQueryMIPBuilder) {
+    public GenericCCAMechanism(List<SATSBidder<T>> bidders, GenericDemandQueryMIPBuilder<G, T> genericDemandQueryMIPBuilder) {
         super(bidders);
         this.genericDemandQueryMIPBuilder = genericDemandQueryMIPBuilder;
     }
@@ -75,7 +75,7 @@ public class GenericCCAMechanism<G extends GenericDefinition<T>, T extends Good>
 
     @Override
     public void calculateSampledStartingPrices(int bidsPerBidder, int numberOfWorldSamples, double fraction, long seed) {
-        GenericWorld<T> world = (GenericWorld<T>) bidders.stream().findAny().map(Bidder::getWorld).orElseThrow(NoSuchFieldError::new);
+        GenericWorld<T> world = (GenericWorld<T>) bidders.stream().findAny().map(SATSBidder::getWorld).orElseThrow(NoSuchFieldError::new);
         // We need a fixed order -> List
         List<GenericDefinition<T>> genericDefinitions = new ArrayList<>(world.getAllGenericDefinitions());
         try {
@@ -84,8 +84,8 @@ public class GenericCCAMechanism<G extends GenericDefinition<T>, T extends Good>
 
             RNGSupplier rngSupplier = new JavaUtilRNGSupplier(seed);
             for (int i = 0; i < numberOfWorldSamples; i++) {
-                List<Bidder<T>> alternateBidders = bidders.stream().map(b -> b.drawSimilarBidder(rngSupplier)).collect(Collectors.toList());
-                for (Bidder<T> bidder : alternateBidders) {
+                List<SATSBidder<T>> alternateBidders = bidders.stream().map(b -> b.drawSimilarBidder(rngSupplier)).collect(Collectors.toList());
+                for (SATSBidder<T> bidder : alternateBidders) {
                     XORQRandomOrderSimple<G, T> valueFunction;
                     valueFunction = (XORQRandomOrderSimple) bidder.getValueFunction(XORQRandomOrderSimple.class, rngSupplier);
                     valueFunction.setIterations(bidsPerBidder);
@@ -136,7 +136,7 @@ public class GenericCCAMechanism<G extends GenericDefinition<T>, T extends Good>
         }
     }
 
-    public Allocation<T> calculateClockPhaseAllocation() {
+    public SATSAllocation<T> calculateClockPhaseAllocation() {
         if (bidsAfterClockPhase == null) {
             logger.info("Starting clock phase for generic bids...");
             bidsAfterClockPhase = runClockPhase();
@@ -147,7 +147,7 @@ public class GenericCCAMechanism<G extends GenericDefinition<T>, T extends Good>
         return wdp.calculateAllocation();
     }
 
-    public Allocation<T> calculateAllocationAfterSupplementaryRound() {
+    public SATSAllocation<T> calculateAllocationAfterSupplementaryRound() {
         if (bidsAfterClockPhase == null) {
             logger.info("Starting clock phase for generic bids...");
             bidsAfterClockPhase = runClockPhase();
@@ -173,7 +173,7 @@ public class GenericCCAMechanism<G extends GenericDefinition<T>, T extends Good>
     }
 
     private Collection<GenericBid<G, T>> runClockPhase() {
-        Map<Bidder<T>, GenericBid<G, T>> bids = new HashMap<>();
+        Map<SATSBidder<T>, GenericBid<G, T>> bids = new HashMap<>();
         GenericWorld<T> world = (GenericWorld<T>) bidders.iterator().next().getWorld();
         Map<G, BigDecimal> prices = new HashMap<>();
         Set<G> genericDefinitions = (Set<G>) world.getAllGenericDefinitions();
@@ -184,7 +184,7 @@ public class GenericCCAMechanism<G extends GenericDefinition<T>, T extends Good>
         boolean done = false;
         while (!done) {
             demand = new HashMap<>();
-            for (Bidder<T> bidder : bidders) {
+            for (SATSBidder<T> bidder : bidders) {
                 GenericDemandQueryMIP<G, T> demandQueryMIP = genericDemandQueryMIPBuilder.getDemandQueryMipFor(bidder, prices, epsilon);
                 demandQueryMIP.setTimeLimit(getTimeLimit());
                 List<? extends GenericDemandQueryResult<G, T>> genericDemandQueryResults = demandQueryMIP.getResultPool(clockPhaseNumberOfBundles);
@@ -248,7 +248,7 @@ public class GenericCCAMechanism<G extends GenericDefinition<T>, T extends Good>
         Collection<GenericBid<G, T>> bids = new HashSet<>();
         if (supplementaryRounds.isEmpty()) supplementaryRounds.add(new ProfitMaximizingGenericSupplementaryRound<>());
 
-        for (Bidder<T> bidder : bidders) {
+        for (SATSBidder<T> bidder : bidders) {
             List<GenericValue<G, T>> newValues = new ArrayList<>();
             for (GenericSupplementaryRound<G, T> supplementaryRound : supplementaryRounds) {
                 newValues.addAll(supplementaryRound.getSupplementaryBids(this, bidder));
@@ -304,14 +304,14 @@ public class GenericCCAMechanism<G extends GenericDefinition<T>, T extends Good>
         this.supplementaryRounds.add(genericSupplementaryRound);
     }
 
-    public Map<Bidder<T>, Integer> getBidCountAfterClockPhase() {
-        Map<Bidder<T>, Integer> map = new HashMap<>();
+    public Map<SATSBidder<T>, Integer> getBidCountAfterClockPhase() {
+        Map<SATSBidder<T>, Integer> map = new HashMap<>();
         bidsAfterClockPhase.forEach(bid -> map.put(bid.getBidder(), bid.getValues().size()));
         return map;
     }
 
-    public Map<Bidder<T>, Integer> getBidCountAfterSupplementaryRound() {
-        Map<Bidder<T>, Integer> map = new HashMap<>();
+    public Map<SATSBidder<T>, Integer> getBidCountAfterSupplementaryRound() {
+        Map<SATSBidder<T>, Integer> map = new HashMap<>();
         bidsAfterSupplementaryRound.forEach(bid -> map.put(bid.getBidder(), bid.getValues().size()));
         return map;
     }
@@ -328,7 +328,7 @@ public class GenericCCAMechanism<G extends GenericDefinition<T>, T extends Good>
         return priceUpdater.getLastPrices();
     }
 
-    public GenericBid<G, T> getBidAfterClockPhase(Bidder<T> bidder) {
+    public GenericBid<G, T> getBidAfterClockPhase(SATSBidder<T> bidder) {
         for (GenericBid<G, T> bid : bidsAfterClockPhase) {
             if (bid.getBidder().equals(bidder)) return bid;
         }
@@ -337,7 +337,7 @@ public class GenericCCAMechanism<G extends GenericDefinition<T>, T extends Good>
     }
 
 
-    public GenericBid<G, T> getBidAfterSupplementaryRound(Bidder<T> bidder) {
+    public GenericBid<G, T> getBidAfterSupplementaryRound(SATSBidder<T> bidder) {
         for (GenericBid<G, T> bid : bidsAfterSupplementaryRound) {
             if (bid.getBidder().equals(bidder)) return bid;
         }

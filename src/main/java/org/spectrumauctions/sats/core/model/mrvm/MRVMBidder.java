@@ -30,7 +30,7 @@ import java.util.Map.Entry;
 /**
  * @author Michael Weiss
  */
-public abstract class MRVMBidder extends Bidder<MRVMLicense> implements GenericValueBidder<MRVMGenericDefinition> {
+public abstract class MRVMBidder extends SATSBidder<MRVMLicense> implements GenericValueBidder<MRVMGenericDefinition> {
 
     private static final long serialVersionUID = 8394009700504454313L;
     private transient MRVMWorld world;
@@ -224,7 +224,7 @@ public abstract class MRVMBidder extends Bidder<MRVMLicense> implements GenericV
     }
 
     /**
-     * @see Bidder#refreshReference(World)
+     * @see SATSBidder#refreshReference(World)
      */
     @Override
     public void refreshReference(World world) {

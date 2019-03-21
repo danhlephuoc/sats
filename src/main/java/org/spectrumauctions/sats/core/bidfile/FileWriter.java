@@ -8,8 +8,7 @@ package org.spectrumauctions.sats.core.bidfile;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericDefinition;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericLang;
 import org.spectrumauctions.sats.core.bidlang.xor.XORLanguage;
-import org.spectrumauctions.sats.core.model.Good;
-import org.spectrumauctions.sats.core.model.bvm.BMLicense;
+import org.spectrumauctions.sats.core.model.SATSGood;
 import org.spectrumauctions.sats.core.util.CacheMap;
 
 import java.io.File;
@@ -25,15 +24,15 @@ public abstract class FileWriter {
 
     public static final int VALUE_STRING_MAXLENGTH = 7;
 
-    public abstract File writeMultiBidderXOR(Collection<XORLanguage<? extends Good>> valueFunctions, int numberOfBids, String filePrefix)
+    public abstract File writeMultiBidderXOR(Collection<XORLanguage<? extends SATSGood>> valueFunctions, int numberOfBids, String filePrefix)
             throws IOException;
 
-    public abstract File writeSingleBidderXOR(XORLanguage<? extends Good> valueFunction, int numberOfBids, String filePrefix) throws IOException;
+    public abstract File writeSingleBidderXOR(XORLanguage<? extends SATSGood> valueFunction, int numberOfBids, String filePrefix) throws IOException;
 
-    public abstract File writeMultiBidderXORQ(Collection<GenericLang<GenericDefinition<? extends Good>, ?>> valueFunctions, int numberOfBids, String filePrefix)
+    public abstract File writeMultiBidderXORQ(Collection<GenericLang<GenericDefinition<? extends SATSGood>, ?>> valueFunctions, int numberOfBids, String filePrefix)
             throws IOException;
 
-    public abstract File writeSingleBidderXORQ(GenericLang<GenericDefinition<? extends Good>, ?> lang, int numberOfBids, String filePrefix) throws IOException;
+    public abstract File writeSingleBidderXORQ(GenericLang<GenericDefinition<? extends SATSGood>, ?> lang, int numberOfBids, String filePrefix) throws IOException;
 
     /**
      * @return the file ending of the generated bid files

@@ -27,7 +27,7 @@ public class CATSBidderSetup extends BidderSetup {
         CATSWorld world = bidder.getWorld();
         HashMap<Long, BigDecimal> values = new HashMap<>();
         for (CATSLicense license : world.getLicenses()) {
-            values.put(license.getId(), new BigDecimal(rng.nextGaussian(privateValueMean, privateValueStDev)));
+            values.put(license.getLongId(), new BigDecimal(rng.nextGaussian(privateValueMean, privateValueStDev)));
         }
         return values;
     }
@@ -39,7 +39,7 @@ public class CATSBidderSetup extends BidderSetup {
         private static final double DEFAULT_PRIVATE_VALUE_MEAN = 0;
         private static final double DEFAULT_PRIVATE_VALUE_STDEV = 30;
 
-        private static final String DEFAULT_SETUP_NAME = "CATS Bidder Setup";
+        private static final String DEFAULT_SETUP_NAME = "CATS SATSBidder Setup";
 
         private double privateValueMean;
         private double privateValueStDev;

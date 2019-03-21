@@ -34,7 +34,7 @@ public class CATSBidderTest {
         CATSWorld world = model.createWorld(983742L);
         List<CATSBidder> defaultPopulation = model.createPopulation(world);
         Assert.assertEquals(defaultPopulation.size(), 1);
-        checkBidder(defaultPopulation.get(0), "CATS Bidder Setup");
+        checkBidder(defaultPopulation.get(0), "CATS SATSBidder Setup");
     }
 
     /**
@@ -47,8 +47,8 @@ public class CATSBidderTest {
         model2.setNumberOfBidders(2);
         List<CATSBidder> population2 = model2.createPopulation(world2);
         Assert.assertEquals(population2.size(), 2);
-        checkBidder(population2.get(0), "CATS Bidder Setup");
-        checkBidder(population2.get(1), "CATS Bidder Setup");
+        checkBidder(population2.get(0), "CATS SATSBidder Setup");
+        checkBidder(population2.get(1), "CATS SATSBidder Setup");
     }
 
     /**
@@ -67,7 +67,7 @@ public class CATSBidderTest {
         float expectedValue = 0;
         for (CATSLicense license : completeBundle) {
             expectedValue += license.getCommonValue();
-            expectedValue += customPopulation.get(0).getPrivateValues().get(license.getId()).floatValue();
+            expectedValue += customPopulation.get(0).getPrivateValues().get(license.getLongId()).floatValue();
         }
         expectedValue += Math.pow(completeBundle.size(), 1.2);
 
@@ -89,7 +89,7 @@ public class CATSBidderTest {
         for (CATSLicense license : completeBundle) {
             expectedValue += license.getCommonValue();
             expectedValue += Math.pow(license.getCommonValue(), 2);
-            expectedValue += customPopulation.get(0).getPrivateValues().get(license.getId()).floatValue();
+            expectedValue += customPopulation.get(0).getPrivateValues().get(license.getLongId()).floatValue();
         }
 
         Assert.assertEquals(value.floatValue(), expectedValue, 0.1);
@@ -102,7 +102,7 @@ public class CATSBidderTest {
         CATSBidderSetup.Builder BidderBuilder = new CATSBidderSetup.Builder();
         BidderBuilder.setPrivateValueParameters(15, 60);
         BidderBuilder.setNumberOfBidders(numberOfBidders);
-        BidderBuilder.setSetupName("Test CATS Bidder");
+        BidderBuilder.setSetupName("Test CATS SATSBidder");
 
         List<CATSBidderSetup> regionalSetups = new ArrayList<>();
         regionalSetups.add(BidderBuilder.build());

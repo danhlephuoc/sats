@@ -2,7 +2,7 @@ package org.spectrumauctions.sats.opt.model.lsvm.demandquery;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.lsvm.LSVMBidder;
 import org.spectrumauctions.sats.core.model.lsvm.LSVMLicense;
 import org.spectrumauctions.sats.opt.domain.NonGenericDemandQueryMIP;
@@ -20,7 +20,7 @@ public class LSVM_DemandQueryMIPBuilder implements NonGenericDemandQueryMIPBuild
     private static final Logger logger = LogManager.getLogger(LSVM_DemandQueryMIPBuilder.class);
 
     @Override
-    public NonGenericDemandQueryMIP<LSVMLicense> getDemandQueryMipFor(Bidder bidder, Map prices, double epsilon) {
+    public NonGenericDemandQueryMIP<LSVMLicense> getDemandQueryMipFor(SATSBidder bidder, Map prices, double epsilon) {
         return new LSVM_DemandQueryMIP((LSVMBidder) bidder, (Map<LSVMLicense, BigDecimal>) prices, epsilon);
     }
 }

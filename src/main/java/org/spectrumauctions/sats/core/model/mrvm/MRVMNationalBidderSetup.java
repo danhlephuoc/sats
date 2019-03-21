@@ -70,7 +70,7 @@ public class MRVMNationalBidderSetup extends MRVMBidderSetup {
         private DoubleInterval bInterval;
 
         public Builder() {
-            super("Multi Region Model National Bidder",
+            super("Multi Region Model National SATSBidder",
                     3,
                     new DoubleInterval(700, 1200),
                     new DoubleInterval(0.08, 0.22));

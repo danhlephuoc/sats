@@ -8,7 +8,7 @@ import org.spectrumauctions.sats.core.model.mrvm.MultiRegionModel;
 
 import java.util.List;
 
-public class MRVMAllocationTest {
+public class MRVMSATSAllocationTest {
 
     @Test
     public void testEqualAllocationWhenSolvingTwice() {

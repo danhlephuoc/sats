@@ -5,6 +5,7 @@
  */
 package org.spectrumauctions.sats.opt.model.mrvm;
 
+import ch.uzh.ifi.ce.domain.Bidder;
 import com.google.common.base.Preconditions;
 import edu.harvard.econcs.jopt.solver.IMIPResult;
 import edu.harvard.econcs.jopt.solver.SolveParam;
@@ -13,7 +14,7 @@ import edu.harvard.econcs.jopt.solver.mip.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValue;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.mrvm.*;
 import org.spectrumauctions.sats.core.model.mrvm.MRVMRegionsMap.Region;
 import org.spectrumauctions.sats.opt.domain.WinnerDeterminator;
@@ -31,7 +32,7 @@ import static edu.harvard.econcs.jopt.solver.mip.MIP.MAX_VALUE;
  * @author Michael Weiss
  *
  */
-public class MRVM_MIP extends ModelMIP implements WinnerDeterminator<MRVMLicense> {
+public class MRVM_MIP extends ModelMIP {
 
     private static final Logger logger = LogManager.getLogger(MRVM_MIP.class);
     private static final double DEFAULT_EPSILON = 0.00001;
@@ -60,7 +61,7 @@ public class MRVM_MIP extends ModelMIP implements WinnerDeterminator<MRVMLicense
         this.worldPartialMip = new MRVMWorldPartialMip(
                 bidders,
                 biggestPossibleValue);
-        worldPartialMip.appendToMip(getMip());
+        worldPartialMip.appendToMip(getMIP());
         bidderPartialMips = new HashMap<>();
         for (MRVMBidder bidder : bidders) {
             MRVMBidderPartialMIP bidderPartialMIP;
@@ -74,7 +75,7 @@ public class MRVM_MIP extends ModelMIP implements WinnerDeterminator<MRVMLicense
                 MRVMRegionalBidder globalBidder = (MRVMRegionalBidder) bidder;
                 bidderPartialMIP = new MRVMRegionalBidderPartialMip(globalBidder, scalingFactor, worldPartialMip);
             }
-            bidderPartialMIP.appendToMip(getMip());
+            bidderPartialMIP.appendToMip(getMIP());
             bidderPartialMips.put(bidder, bidderPartialMIP);
         }
     }
@@ -82,22 +83,23 @@ public class MRVM_MIP extends ModelMIP implements WinnerDeterminator<MRVMLicense
 
 
     public void addConstraint(Constraint constraint) {
-        getMip().add(constraint);
+        getMIP().add(constraint);
     }
 
     public void addVariable(Variable variable) {
-        getMip().add(variable);
+        getMIP().add(variable);
     }
 
     public void addObjectiveTerm(double coefficient, Variable variable) {
-        getMip().addObjectiveTerm(coefficient, variable);
+        getMIP().addObjectiveTerm(coefficient, variable);
     }
 
 
     @Override
-    public WinnerDeterminator<MRVMLicense> getWdWithoutBidder(Bidder<MRVMLicense> bidder) {
-        Preconditions.checkArgument(bidders.contains(bidder));
-        return new MRVM_MIP(bidders.stream().filter(b -> !b.equals(bidder)).collect(Collectors.toSet()));
+    public ModelMIP getMIPWithout(Bidder bidder) {
+        MRVMBidder mrvmBidder = (MRVMBidder) bidder;
+        Preconditions.checkArgument(bidders.contains(mrvmBidder));
+        return new MRVM_MIP(bidders.stream().filter(b -> !b.equals(mrvmBidder)).collect(Collectors.toSet()));
     }
 
     /* (non-Javadoc)
@@ -105,8 +107,8 @@ public class MRVM_MIP extends ModelMIP implements WinnerDeterminator<MRVMLicense
      */
     @Override
     public MRVMMipResult calculateAllocation() {
-        getMip().setSolveParam(SolveParam.RELATIVE_OBJ_GAP, epsilon);
-        IMIPResult mipResult = SOLVER.solve(getMip());
+        getMIP().setSolveParam(SolveParam.RELATIVE_OBJ_GAP, epsilon);
+        IMIPResult mipResult = SOLVER.solve(getMIP());
         if (PRINT_SOLVER_RESULT) {
             logger.info("Result:\n" + mipResult);
         }
@@ -136,7 +138,7 @@ public class MRVM_MIP extends ModelMIP implements WinnerDeterminator<MRVMLicense
     }
 
     @Override
-    public WinnerDeterminator<MRVMLicense> copyOf() {
+    public ModelMIP copyOf() {
         return new MRVM_MIP(bidders);
     }
 
@@ -149,12 +151,12 @@ public class MRVM_MIP extends ModelMIP implements WinnerDeterminator<MRVMLicense
     }
 
 
-    @Override
-    public void adjustPayoffs(Map<Bidder<MRVMLicense>, Double> payoffs) {
-        for (Map.Entry<Bidder<MRVMLicense>, Double> entry : payoffs.entrySet()) {
+    /*@Override
+    public void adjustPayoffs(Map<SATSBidder<MRVMLicense>, Double> payoffs) {
+        for (Map.Entry<SATSBidder<MRVMLicense>, Double> entry : payoffs.entrySet()) {
             MRVMBidder bidder = (MRVMBidder) entry.getKey();
             double negativePayoff = -entry.getValue();
-            Variable x = new Variable("x_" + bidder.getId(), VarType.BOOLEAN, 0, 1);
+            Variable x = new Variable("x_" + bidder.getLongId(), VarType.BOOLEAN, 0, 1);
             addVariable(x);
             addObjectiveTerm(negativePayoff, x);
 
@@ -171,9 +173,8 @@ public class MRVM_MIP extends ModelMIP implements WinnerDeterminator<MRVMLicense
                 xConstraint2.addTerm(1, var);
             }
             addConstraint(xConstraint2);
-
         }
-    }
+    }*/
 
     public void setEpsilon(double epsilon) {
         this.epsilon = epsilon;

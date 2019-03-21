@@ -8,7 +8,7 @@ package org.spectrumauctions.sats.opt.model.mrvm;
 import com.google.common.base.Preconditions;
 import edu.harvard.econcs.jopt.solver.mip.*;
 import org.spectrumauctions.sats.core.bidlang.generic.Band;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.mrvm.MRVMBand;
 import org.spectrumauctions.sats.core.model.mrvm.MRVMBidder;
 import org.spectrumauctions.sats.core.model.mrvm.MRVMRegionsMap.Region;
@@ -137,25 +137,25 @@ public abstract class MRVMBidderPartialMIP extends PartialMIP {
         return var;
     }
 
-    static String createIndex(Bidder<?> bidder, Region region) {
+    static String createIndex(SATSBidder<?> bidder, Region region) {
         StringBuilder builder = new StringBuilder("_b");
-        builder.append(bidder.getId());
+        builder.append(bidder.getLongId());
         builder.append(",r");
         builder.append(region.getId());
         return builder.toString();
     }
 
-    static String createIndex(Bidder<?> bidder, Band band) {
+    static String createIndex(SATSBidder<?> bidder, Band band) {
         StringBuilder builder = new StringBuilder("_b");
-        builder.append(bidder.getId());
+        builder.append(bidder.getLongId());
         builder.append(",band_");
         builder.append(band.getName());
         return builder.toString();
     }
 
-    static String createIndex(Bidder<?> bidder, Region region, Band band) {
+    static String createIndex(SATSBidder<?> bidder, Region region, Band band) {
         StringBuilder builder = new StringBuilder("_b");
-        builder.append(bidder.getId());
+        builder.append(bidder.getLongId());
         builder.append(",r");
         builder.append(region.getId());
         builder.append(",band_");

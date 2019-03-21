@@ -149,7 +149,7 @@ public class CatsXOR implements XORLanguage<CATSLicense> {
                 // We didn't construct an original bid yet
                 WeightedRandomCollection<CATSLicense> weightedGoods = new WeightedRandomCollection<>(uniRng);
                 goods.forEach(g -> {
-                    double positivePrivateValue = (bidder.getPrivateValues().get(g.getId()).doubleValue() - minValue);
+                    double positivePrivateValue = (bidder.getPrivateValues().get(g.getLongId()).doubleValue() - minValue);
                     weightedGoods.add(positivePrivateValue, g);
                 });
                 CATSLicense first = weightedGoods.next();
@@ -221,7 +221,7 @@ public class CatsXOR implements XORLanguage<CATSLicense> {
                 // of the licenses in the bundle.
                 goods.stream().filter(l -> !bundle.contains(l) && edgeExists(l, bundle))
                         .forEach(g -> {
-                            double positivePrivateValue = bidder.getPrivateValues().get(g.getId()).doubleValue() - minValue;
+                            double positivePrivateValue = bidder.getPrivateValues().get(g.getLongId()).doubleValue() - minValue;
                             neighbors.add(positivePrivateValue, g);
                         });
                 if (neighbors.hasNext()) return neighbors.next();

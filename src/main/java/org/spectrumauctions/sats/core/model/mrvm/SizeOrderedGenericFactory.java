@@ -9,7 +9,7 @@ import org.spectrumauctions.sats.core.bidlang.generic.FlatSizeIterators.GenericS
 import org.spectrumauctions.sats.core.bidlang.generic.FlatSizeIterators.GenericSizeIncreasing;
 import org.spectrumauctions.sats.core.bidlang.generic.FlatSizeIterators.GenericSizeOrdered;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValueBidder;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.UnsupportedBiddingLanguageException;
 
 import java.io.Serializable;
@@ -54,7 +54,7 @@ public class SizeOrderedGenericFactory implements Serializable {
         }
 
         @Override
-        public Bidder<MRVMLicense> getBidder() {
+        public SATSBidder<MRVMLicense> getBidder() {
             return bidder;
         }
 
@@ -87,7 +87,7 @@ public class SizeOrderedGenericFactory implements Serializable {
         }
 
         @Override
-        public Bidder<MRVMLicense> getBidder() {
+        public SATSBidder<MRVMLicense> getBidder() {
             return bidder;
         }
 

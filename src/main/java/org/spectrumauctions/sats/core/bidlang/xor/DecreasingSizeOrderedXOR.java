@@ -5,9 +5,9 @@
  */
 package org.spectrumauctions.sats.core.bidlang.xor;
 
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.Bundle;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSGood;
 
 import java.math.BigInteger;
 import java.util.Collection;
@@ -17,9 +17,9 @@ import java.util.Iterator;
  * @author Michael Weiss
  *
  */
-public class DecreasingSizeOrderedXOR<T extends Good> extends SizeOrderedXOR<T> {
+public class DecreasingSizeOrderedXOR<T extends SATSGood> extends SizeOrderedXOR<T> {
 
-    public DecreasingSizeOrderedXOR(Collection<T> goods, Bidder<T> bidder) {
+    public DecreasingSizeOrderedXOR(Collection<T> goods, SATSBidder<T> bidder) {
         super(goods, bidder);
     }
 

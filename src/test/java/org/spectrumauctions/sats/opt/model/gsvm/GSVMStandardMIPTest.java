@@ -7,7 +7,7 @@ import org.spectrumauctions.sats.core.model.gsvm.*;
 import org.spectrumauctions.sats.core.util.random.DoubleInterval;
 import org.spectrumauctions.sats.core.util.random.IntegerInterval;
 import org.spectrumauctions.sats.core.util.random.JavaUtilRNGSupplier;
-import org.spectrumauctions.sats.opt.domain.ItemAllocation;
+import org.spectrumauctions.sats.opt.domain.ItemSATSAllocation;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -21,10 +21,10 @@ public class GSVMStandardMIPTest {
         List<GSVMBidder> population = model.createPopulation(world);
 
         GSVMStandardMIP gsvmMIP = new GSVMStandardMIP(world, population);
-        ItemAllocation<GSVMLicense> allocation = gsvmMIP.calculateAllocation();
+        ItemSATSAllocation<GSVMLicense> allocation = gsvmMIP.calculateAllocation();
 
         GSVMStandardMIP secondGsvmMIP = new GSVMStandardMIP(world, population);
-        ItemAllocation<GSVMLicense> secondAllocation = secondGsvmMIP.calculateAllocation();
+        ItemSATSAllocation<GSVMLicense> secondAllocation = secondGsvmMIP.calculateAllocation();
 
         population.forEach(bidder -> Assert.assertEquals(allocation.getAllocation(bidder), secondAllocation.getAllocation(bidder)));
     }
@@ -40,10 +40,10 @@ public class GSVMStandardMIPTest {
         Assert.assertEquals(population.get(0), invertedPopulation.get(invertedPopulation.size() - 1));
 
         GSVMStandardMIP gsvmMIP = new GSVMStandardMIP(world, population);
-        ItemAllocation<GSVMLicense> allocation = gsvmMIP.calculateAllocation();
+        ItemSATSAllocation<GSVMLicense> allocation = gsvmMIP.calculateAllocation();
 
         GSVMStandardMIP invertedGsvmMIP = new GSVMStandardMIP(world, invertedPopulation);
-        ItemAllocation<GSVMLicense> invertedAllocation = invertedGsvmMIP.calculateAllocation();
+        ItemSATSAllocation<GSVMLicense> invertedAllocation = invertedGsvmMIP.calculateAllocation();
 
         population.forEach(bidder -> Assert.assertEquals(allocation.getAllocation(bidder), invertedAllocation.getAllocation(bidder)));
     }
@@ -55,7 +55,7 @@ public class GSVMStandardMIPTest {
 		List<GSVMBidder> population = model.createPopulation(world);
 
 		GSVMStandardMIP gsvmMIP = new GSVMStandardMIP(world, population);
-		ItemAllocation<GSVMLicense> allocation = gsvmMIP.calculateAllocation();
+		ItemSATSAllocation<GSVMLicense> allocation = gsvmMIP.calculateAllocation();
 
 		Map<GSVMLicense, GSVMBidder> invertedAllocation = new HashMap<>();
 
@@ -63,7 +63,7 @@ public class GSVMStandardMIPTest {
 			Bundle<GSVMLicense> bundle = allocation.getAllocation(bidder);
 			for (GSVMLicense license : bundle) {
 				// Checks if same license is allocated multiple times
-				Assert.assertTrue("Invalid Allocation, same license allocated multiple times",
+				Assert.assertTrue("Invalid SATSAllocation, same license allocated multiple times",
 						!invertedAllocation.containsKey(license));
 				invertedAllocation.put(license, bidder);
 			}
@@ -80,9 +80,9 @@ public class GSVMStandardMIPTest {
 		List<GSVMBidder> population = customPopulation(world, 2, 1);
 
 		GSVMStandardMIP gsvmMIP = new GSVMStandardMIP(world, population);
-		ItemAllocation<GSVMLicense> allocation = gsvmMIP.calculateAllocation();
+		ItemSATSAllocation<GSVMLicense> allocation = gsvmMIP.calculateAllocation();
 
-		// Efficient Allocation should be 91.0
+		// Efficient SATSAllocation should be 91.0
 		Assert.assertEquals(0, BigDecimal.valueOf(91.0).compareTo(allocation.getTotalValue()));
 		testTotalValue(population, allocation);
 	}
@@ -96,10 +96,10 @@ public class GSVMStandardMIPTest {
 		List<GSVMBidder> population = buildSpecialPopulation(world);
 
 		GSVMStandardMIP gsvmMIP = new GSVMStandardMIP(world, population, true);
-		ItemAllocation<GSVMLicense> allocation = gsvmMIP.calculateAllocation();
+		ItemSATSAllocation<GSVMLicense> allocation = gsvmMIP.calculateAllocation();
 
 		GSVMBidder nationalBidder = population.stream()
-				.filter(bidder -> bidder.getSetupType().equals("Test National Bidder")).findFirst().get();
+				.filter(bidder -> bidder.getSetupType().equals("Test National SATSBidder")).findFirst().get();
 
 		Bundle<GSVMLicense> fullBundle = new Bundle<>(world.getLicenses());
 
@@ -120,10 +120,10 @@ public class GSVMStandardMIPTest {
 
 		// use only licenses with positive values
 		GSVMStandardMIP gsvmMIP = new GSVMStandardMIP(world, population, false);
-		ItemAllocation<GSVMLicense> allocation = gsvmMIP.calculateAllocation();
+		ItemSATSAllocation<GSVMLicense> allocation = gsvmMIP.calculateAllocation();
 
 		GSVMBidder nationalBidder = population.stream()
-				.filter(bidder -> bidder.getSetupType().equals("Test National Bidder")).findFirst().get();
+				.filter(bidder -> bidder.getSetupType().equals("Test National SATSBidder")).findFirst().get();
 
 		Bundle<GSVMLicense> fullBundle = new Bundle<>(world.getLicenses());
 
@@ -133,7 +133,7 @@ public class GSVMStandardMIPTest {
 		testTotalValue(population, allocation);
 	}
 
-	private void testTotalValue(List<GSVMBidder> population, ItemAllocation<GSVMLicense> allocation) {
+	private void testTotalValue(List<GSVMBidder> population, ItemSATSAllocation<GSVMLicense> allocation) {
 		BigDecimal totalValue = new BigDecimal(0);
 
 		for (GSVMBidder bidder : population) {
@@ -154,13 +154,13 @@ public class GSVMStandardMIPTest {
 		regionalBidderBuilder.setLowNationalValueInterval(new DoubleInterval(25));
 		regionalBidderBuilder.setHighNationalValueInterval(new DoubleInterval(35));
 		regionalBidderBuilder.setNumberOfBidders(numberOfRegionalBidders);
-		regionalBidderBuilder.setSetupName("Test Regional Bidder");
+		regionalBidderBuilder.setSetupName("Test Regional SATSBidder");
 
 		GSVMNationalBidderSetup.Builder nationalBidderBuilder = new GSVMNationalBidderSetup.Builder();
 		nationalBidderBuilder.setNumberOfBidders(numberOfNationalBidders);
 		nationalBidderBuilder.setLowNationalValueInterval(new DoubleInterval(16));
 		nationalBidderBuilder.setHighNationalValueInterval(new DoubleInterval(26));
-		nationalBidderBuilder.setSetupName("Test National Bidder");
+		nationalBidderBuilder.setSetupName("Test National SATSBidder");
 
 		Collection<GSVMRegionalBidderSetup> regionalSetups = new ArrayList<>();
 		regionalSetups.add(regionalBidderBuilder.build());
@@ -178,13 +178,13 @@ public class GSVMStandardMIPTest {
 		GSVMRegionalBidderSetup.Builder regionalBidderBuilder = new GSVMRegionalBidderSetup.Builder();
 		regionalBidderBuilder.setRegionalValueInterval(new DoubleInterval(0.001));
 		regionalBidderBuilder.setNumberOfBidders(1);
-		regionalBidderBuilder.setSetupName("Test Regional Bidder");
+		regionalBidderBuilder.setSetupName("Test Regional SATSBidder");
 
 		GSVMNationalBidderSetup.Builder nationalBidderBuilder = new GSVMNationalBidderSetup.Builder();
 		nationalBidderBuilder.setNumberOfBidders(1);
 		nationalBidderBuilder.setLowNationalValueInterval(new DoubleInterval(1000));
 		nationalBidderBuilder.setHighNationalValueInterval(new DoubleInterval(2000));
-		nationalBidderBuilder.setSetupName("Test National Bidder");
+		nationalBidderBuilder.setSetupName("Test National SATSBidder");
 
 		Collection<GSVMRegionalBidderSetup> regionalSetups = new ArrayList<>();
 		regionalSetups.add(regionalBidderBuilder.build());

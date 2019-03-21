@@ -17,6 +17,7 @@ import org.spectrumauctions.sats.core.model.srvm.SingleRegionModel;
 import org.spectrumauctions.sats.mechanism.domain.Payment;
 import org.spectrumauctions.sats.mechanism.domain.mechanisms.AuctionMechanism;
 import org.spectrumauctions.sats.opt.domain.WinnerDeterminator;
+import org.spectrumauctions.sats.opt.model.ModelMIP;
 import org.spectrumauctions.sats.opt.model.gsvm.GSVMStandardMIP;
 import org.spectrumauctions.sats.opt.model.lsvm.LSVMStandardMIP;
 import org.spectrumauctions.sats.opt.model.mrvm.MRVM_MIP;
@@ -32,12 +33,12 @@ public class VCGWithMRVMTest {
     @Ignore
     public void testVCGWithStandardMRVM() {
         List<MRVMBidder> bidders = new MultiRegionModel().createNewPopulation(234456867);
-        WinnerDeterminator<MRVMLicense> wdp = new MRVM_MIP(bidders);
-        AuctionMechanism<MRVMLicense> am = new VCGMechanism<>(wdp);
-        Payment<MRVMLicense> payment = am.getPayment();
-        double totalValue = am.getMechanismResult().getAllocation().getTotalValue().doubleValue();
-        double sumOfValues = bidders.stream().mapToDouble(b -> am.getMechanismResult().getAllocation().getTradeValue(b).doubleValue()).sum();
+        ModelMIP wdp = new MRVM_MIP(bidders);
+        ch.uzh.ifi.ce.mechanisms.AuctionMechanism am = new ModelVCGMechanism(wdp);
+        ch.uzh.ifi.ce.domain.Payment payment = am.getPayment();
+        double totalValue = am.getAllocation().getTotalAllocationValue().doubleValue();
+        double sumOfValues = bidders.stream().mapToDouble(b -> am.getAllocation().getTradesMap().get(b).getValue().doubleValue()).sum();
         assertEquals(totalValue, sumOfValues, 1e-6);
-        assertEquals(3.42515584861134e7, am.getMechanismResult().getAllocation().getTotalValue().doubleValue(), 1e-2);
+        assertEquals(3.42515584861134e7, am.getAllocation().getTotalAllocationValue().doubleValue(), 1e-2);
     }
 }

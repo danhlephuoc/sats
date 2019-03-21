@@ -8,7 +8,7 @@ package org.spectrumauctions.sats.opt.model.srvm;
 import com.google.common.base.Preconditions;
 import edu.harvard.econcs.jopt.solver.mip.*;
 import org.spectrumauctions.sats.core.bidlang.generic.Band;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.srvm.SRVMBidder;
 import org.spectrumauctions.sats.core.util.math.ContinuousPiecewiseLinearFunction;
 import org.spectrumauctions.sats.opt.domain.PartialMIP;
@@ -46,7 +46,7 @@ public class SRVMBidderPartialMIP extends PartialMIP {
 
     private void initVariables() {
         this.zVariables = createZVariables();
-        this.wVariable = new Variable(wVariablePrefix + "_" + bidder.getId(), VarType.BOOLEAN, 0, 1);
+        this.wVariable = new Variable(wVariablePrefix + "_" + bidder.getLongId(), VarType.BOOLEAN, 0, 1);
         this.valueVariables = createValueVariables();
         this.alphaVariables = createHelperVariables("alpha");
         this.betaVariables = createHelperVariables("beta");
@@ -125,9 +125,9 @@ public class SRVMBidderPartialMIP extends PartialMIP {
         return var;
     }
 
-    static String createIndex(Bidder<?> bidder, Band band) {
+    static String createIndex(SATSBidder<?> bidder, Band band) {
         StringBuilder builder = new StringBuilder("_b");
-        builder.append(bidder.getId());
+        builder.append(bidder.getLongId());
         builder.append(",band_");
         builder.append(band.getName());
         return builder.toString();

@@ -73,7 +73,7 @@ public class MRVMLocalBidderSetup extends MRVMBidderSetup {
         private List<String> regionNotes;
 
         public Builder() {
-            super("Multi Region Model Local Bidder",
+            super("Multi Region Model Local SATSBidder",
                     3,
                     new DoubleInterval(60, 100),
                     new DoubleInterval(0.05, 0.12));

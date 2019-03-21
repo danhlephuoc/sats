@@ -2,22 +2,22 @@ package org.spectrumauctions.sats.mechanism.cca.supplementaryround;
 
 import org.spectrumauctions.sats.core.bidlang.xor.XORBid;
 import org.spectrumauctions.sats.core.bidlang.xor.XORValue;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.Bundle;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSGood;
 import org.spectrumauctions.sats.mechanism.cca.NonGenericCCAMechanism;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class LastBidsTrueValueNonGenericSupplementaryRound<T extends Good> implements NonGenericSupplementaryRound<T> {
+public class LastBidsTrueValueNonGenericSupplementaryRound<T extends SATSGood> implements NonGenericSupplementaryRound<T> {
 
     private static final int DEFAULT_NUMBER_OF_SUPPLEMENTARY_BIDS = 500;
 
     private int numberOfSupplementaryBids = DEFAULT_NUMBER_OF_SUPPLEMENTARY_BIDS;
 
     @Override
-    public List<XORValue<T>> getSupplementaryBids(NonGenericCCAMechanism<T> cca, Bidder<T> bidder) {
+    public List<XORValue<T>> getSupplementaryBids(NonGenericCCAMechanism<T> cca, SATSBidder<T> bidder) {
         XORBid<T> bid = cca.getBidAfterClockPhase(bidder);
         List<XORValue<T>> result = new ArrayList<>();
         int count = 0;

@@ -8,7 +8,7 @@ package org.spectrumauctions.sats.core.bidlang.generic.FlatSizeIterators;
 import com.google.common.collect.Sets;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericDefinition;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValue;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSGood;
 import org.spectrumauctions.sats.core.model.UnsupportedBiddingLanguageException;
 
 import java.util.*;
@@ -16,7 +16,7 @@ import java.util.*;
 /**
  * @author Michael Weiss
  */
-public abstract class GenericSizeDecreasing<T extends GenericDefinition<S>, S extends Good> extends GenericSizeOrdered<T, S> {
+public abstract class GenericSizeDecreasing<T extends GenericDefinition<S>, S extends SATSGood> extends GenericSizeOrdered<T, S> {
 
     protected GenericSizeDecreasing(Collection<T> allPossibleGenericDefintions) throws UnsupportedBiddingLanguageException {
         super(allPossibleGenericDefintions);

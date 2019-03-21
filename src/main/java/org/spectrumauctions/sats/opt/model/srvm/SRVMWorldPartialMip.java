@@ -6,6 +6,7 @@
 package org.spectrumauctions.sats.opt.model.srvm;
 
 import com.google.common.base.Preconditions;
+import edu.harvard.econcs.jopt.solver.IMIP;
 import edu.harvard.econcs.jopt.solver.mip.*;
 import org.spectrumauctions.sats.core.bidlang.generic.Band;
 import org.spectrumauctions.sats.core.model.srvm.SRVMBand;
@@ -77,7 +78,7 @@ public class SRVMWorldPartialMip extends PartialMIP {
         for (SRVMBidder bidder : bidders) {
             Map<Band, Variable> temp = new HashMap<>();
             for (SRVMBand band : world.getBands()) {
-                String varName = prefix + "_" + bidder.getId() + "_" + band.getName();
+                String varName = prefix + "_" + bidder.getLongId() + "_" + band.getName();
                 Variable var = new Variable(varName, VarType.DOUBLE, 0, MIP.MAX_VALUE);
                 temp.put(band, var);
             }
@@ -101,7 +102,7 @@ public class SRVMWorldPartialMip extends PartialMIP {
         return Collections.unmodifiableMap(result);
     }
 
-    private void appendObjectiveToMip(MIP mip) {
+    private void appendObjectiveToMip(IMIP mip) {
         mip.setObjectiveMax(true);
         if ((mip.getLinearObjectiveTerms() != null && mip.getQuadraticObjectiveTerms() != null)
                 || mip.getObjectiveTerms().size() != 0) {
@@ -126,7 +127,7 @@ public class SRVMWorldPartialMip extends PartialMIP {
      * Furthermore, this implementation of a PartialMip adds the objective term to the MIP
      */
     @Override
-    public void appendToMip(MIP mip) {
+    public void appendToMip(IMIP mip) {
         super.appendToMip(mip);
         appendObjectiveToMip(mip);
     }
@@ -136,7 +137,7 @@ public class SRVMWorldPartialMip extends PartialMIP {
      * @see PartialMIP#appendConstraintsToMip(edu.harvard.econcs.jopt.solver.mip.MIP)
      */
     @Override
-    public void appendConstraintsToMip(MIP mip) {
+    public void appendConstraintsToMip(IMIP mip) {
         super.appendConstraintsToMip(mip);
         for (Constraint c : createNumberOfLotsConstraints()) {
             mip.add(c);
@@ -144,7 +145,7 @@ public class SRVMWorldPartialMip extends PartialMIP {
     }
 
     @Override
-    public void appendVariablesToMip(MIP mip) {
+    public void appendVariablesToMip(IMIP mip) {
         super.appendVariablesToMip(mip);
         for (Map.Entry<SRVMBidder, Map<Band, Variable>> bidderMapEntry : vmVariables.entrySet()) {
             for (Map.Entry<Band, Variable> bandVariableEntry : bidderMapEntry.getValue().entrySet()) {

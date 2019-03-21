@@ -6,11 +6,11 @@
 package org.spectrumauctions.sats.core.bidlang.xor;
 
 import org.spectrumauctions.sats.core.bidlang.BiddingLanguage;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSGood;
 
 import java.util.Iterator;
 
-public interface XORLanguage<T extends Good> extends BiddingLanguage {
+public interface XORLanguage<T extends SATSGood> extends BiddingLanguage {
 
     Iterator<XORValue<T>> iterator();
 

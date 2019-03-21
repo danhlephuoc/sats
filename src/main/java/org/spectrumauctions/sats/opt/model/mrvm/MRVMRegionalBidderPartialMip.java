@@ -5,6 +5,7 @@
  */
 package org.spectrumauctions.sats.opt.model.mrvm;
 
+import edu.harvard.econcs.jopt.solver.IMIP;
 import edu.harvard.econcs.jopt.solver.mip.CompareType;
 import edu.harvard.econcs.jopt.solver.mip.Constraint;
 import edu.harvard.econcs.jopt.solver.mip.MIP;
@@ -48,7 +49,7 @@ public class MRVMRegionalBidderPartialMip extends MRVMBidderPartialMIP {
      * @see PartialMIP#appendToMip(edu.harvard.econcs.jopt.solver.mip.MIP)
      */
     @Override
-    public void appendToMip(MIP mip) {
+    public void appendToMip(IMIP mip) {
         super.appendToMip(mip);
         mip.add(constrainValue());
     }

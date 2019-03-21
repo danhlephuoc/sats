@@ -40,8 +40,8 @@ public class GSVMBidderTest {
 
         Assert.assertEquals(defaultPopulation.size(), 7);
 
-        checkBidder(defaultPopulation.get(0), "Regional Bidder Setup");
-        checkBidder(defaultPopulation.get(6), "National Bidder Setup");
+        checkBidder(defaultPopulation.get(0), "Regional SATSBidder Setup");
+        checkBidder(defaultPopulation.get(6), "National SATSBidder Setup");
     }
 
     /**
@@ -57,8 +57,8 @@ public class GSVMBidderTest {
 
         Assert.assertEquals(minimalPopulation.size(), 5);
 
-        checkBidder(minimalPopulation.get(0), "Regional Bidder Setup");
-        checkBidder(minimalPopulation.get(4), "National Bidder Setup");
+        checkBidder(minimalPopulation.get(0), "Regional SATSBidder Setup");
+        checkBidder(minimalPopulation.get(4), "National SATSBidder Setup");
     }
 
     /**
@@ -73,8 +73,8 @@ public class GSVMBidderTest {
         Assert.assertEquals(customPopulation.size(), 10);
 
         for (int i = 0; i < 8; i++)
-            checkBidder(customPopulation.get(i), "Test Regional Bidder");
-        for (int i = 8; i < 10; i++) checkBidder(customPopulation.get(i), "Test National Bidder");
+            checkBidder(customPopulation.get(i), "Test Regional SATSBidder");
+        for (int i = 8; i < 10; i++) checkBidder(customPopulation.get(i), "Test National SATSBidder");
 
         BigDecimal[] values = new BigDecimal[10];
         for (int i = 0; i < values.length; i++) values[i] = customPopulation.get(i).calculateValue(completeBundle);
@@ -122,8 +122,8 @@ public class GSVMBidderTest {
         Bundle<GSVMLicense> complete = new Bundle<>(world.getLicenses());
 
         for (int i = 0; i < 3; i++)
-            checkBidder(customPopulation.get(i), "Test Regional Bidder");
-        for (int i = 3; i < 4; i++) checkBidder(customPopulation.get(i), "Test National Bidder");
+            checkBidder(customPopulation.get(i), "Test Regional SATSBidder");
+        for (int i = 3; i < 4; i++) checkBidder(customPopulation.get(i), "Test National SATSBidder");
 
         // Assert that national bidder has zero value for the whole regional bundle
         Assert.assertEquals(customPopulation.get(3).calculateValue(regionalBundle).doubleValue(), 0, 0);
@@ -165,8 +165,8 @@ public class GSVMBidderTest {
         Assert.assertEquals(customPopulation.size(), 4);
 
         for (int i = 0; i < 3; i++)
-            checkBidder(customPopulation.get(i), "Test Regional Bidder");
-        for (int i = 3; i < 4; i++) checkBidder(customPopulation.get(i), "Test National Bidder");
+            checkBidder(customPopulation.get(i), "Test Regional SATSBidder");
+        for (int i = 3; i < 4; i++) checkBidder(customPopulation.get(i), "Test National SATSBidder");
 
         Bundle<GSVMLicense> regionalBundle = new Bundle<>(Arrays.asList(world.getRegionalCircle().getLicenses()));
         Bundle<GSVMLicense> complete = new Bundle<>(world.getLicenses());
@@ -198,13 +198,13 @@ public class GSVMBidderTest {
         regionalBidderBuilder.setLowNationalValueInterval(new DoubleInterval(25));
         regionalBidderBuilder.setHighNationalValueInterval(new DoubleInterval(35));
         regionalBidderBuilder.setNumberOfBidders(numberOfRegionalBidders);
-        regionalBidderBuilder.setSetupName("Test Regional Bidder");
+        regionalBidderBuilder.setSetupName("Test Regional SATSBidder");
 
         GSVMNationalBidderSetup.Builder nationalBidderBuilder = new GSVMNationalBidderSetup.Builder();
         nationalBidderBuilder.setNumberOfBidders(numberOfNationalBidders);
         nationalBidderBuilder.setLowNationalValueInterval(new DoubleInterval(16));
         nationalBidderBuilder.setHighNationalValueInterval(new DoubleInterval(26));
-        nationalBidderBuilder.setSetupName("Test National Bidder");
+        nationalBidderBuilder.setSetupName("Test National SATSBidder");
 
         Collection<GSVMRegionalBidderSetup> regionalSetups = new ArrayList<>();
         regionalSetups.add(regionalBidderBuilder.build());

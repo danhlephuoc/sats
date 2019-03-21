@@ -18,7 +18,7 @@ import java.util.TreeSet;
  *
  * @param <T>
  */
-public class Bundle<T extends Good> extends TreeSet<T> {
+public class Bundle<T extends SATSGood> extends TreeSet<T> {
 
     private static final long serialVersionUID = -821067248569898586L;
 
@@ -37,7 +37,7 @@ public class Bundle<T extends Good> extends TreeSet<T> {
     }
 
     public Bundle() {
-        super(new Good.IdComparator());
+        super(new SATSGood.IdComparator());
     }
 
     public String itemIds(String deliminator) {
@@ -48,7 +48,7 @@ public class Bundle<T extends Good> extends TreeSet<T> {
                 ids.append(deliminator);
             }
             first = false;
-            ids.append(String.valueOf(good.getId()));
+            ids.append(String.valueOf(good.getLongId()));
         }
         return ids.toString();
     }
@@ -56,7 +56,7 @@ public class Bundle<T extends Good> extends TreeSet<T> {
     @Override
     public int hashCode() {
         int hashCode = 0;
-        for (Good good : this) {
+        for (SATSGood good : this) {
             hashCode = hashCode * 32 + good.hashCode();
         }
         return hashCode;

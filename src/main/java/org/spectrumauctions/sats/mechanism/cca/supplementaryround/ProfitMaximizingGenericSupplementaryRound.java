@@ -2,8 +2,8 @@ package org.spectrumauctions.sats.mechanism.cca.supplementaryround;
 
 import org.spectrumauctions.sats.core.bidlang.generic.GenericDefinition;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValue;
-import org.spectrumauctions.sats.core.model.Bidder;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSBidder;
+import org.spectrumauctions.sats.core.model.SATSGood;
 import org.spectrumauctions.sats.mechanism.cca.GenericCCAMechanism;
 import org.spectrumauctions.sats.opt.domain.GenericDemandQueryMIP;
 import org.spectrumauctions.sats.opt.domain.GenericDemandQueryMIPBuilder;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ProfitMaximizingGenericSupplementaryRound<G extends GenericDefinition<T>, T extends Good> implements GenericSupplementaryRound<G, T> {
+public class ProfitMaximizingGenericSupplementaryRound<G extends GenericDefinition<T>, T extends SATSGood> implements GenericSupplementaryRound<G, T> {
 
     private static final int DEFAULT_NUMBER_OF_SUPPLEMENTARY_BIDS = 500;
 
@@ -22,7 +22,7 @@ public class ProfitMaximizingGenericSupplementaryRound<G extends GenericDefiniti
     private boolean useLastDemandedPrices = false;
 
     @Override
-    public List<GenericValue<G, T>> getSupplementaryBids(GenericCCAMechanism<G, T> cca, Bidder<T> bidder) {
+    public List<GenericValue<G, T>> getSupplementaryBids(GenericCCAMechanism<G, T> cca, SATSBidder<T> bidder) {
         GenericDemandQueryMIPBuilder<G, T> genericDemandQueryMIPBuilder = cca.getDemandQueryBuilder();
         Map<G, BigDecimal> finalPrices = cca.getFinalPrices();
         Map<G, BigDecimal> lastPrices = cca.getLastPrices();

@@ -33,7 +33,7 @@ public abstract class SRVMWorldGen {
 
     public static Set<SRVMBidderSetup> getSimpleSmallBidderSetup(int numberOfBidders) {
         SRVMBidderSetup.SmallBidderBuilder builder = new SRVMBidderSetup.SmallBidderBuilder();
-        builder.setSetupName("Simple Small Bidder");
+        builder.setSetupName("Simple Small SATSBidder");
         builder.setNumberOfBidders(numberOfBidders);
         Set<SRVMBidderSetup> setups = new HashSet<>();
         setups.add(builder.build());
@@ -42,7 +42,7 @@ public abstract class SRVMWorldGen {
 
     public static Set<SRVMBidderSetup> getSimpleHighFrequencyBidderSetup(int numberOfBidders) {
         SRVMBidderSetup.HighFrequenceBidderBuilder builder = new SRVMBidderSetup.HighFrequenceBidderBuilder();
-        builder.setSetupName("Simple High Frequency Bidder");
+        builder.setSetupName("Simple High Frequency SATSBidder");
         builder.setNumberOfBidders(numberOfBidders);
         Set<SRVMBidderSetup> setups = new HashSet<>();
         setups.add(builder.build());

@@ -12,7 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.spectrumauctions.sats.core.bidlang.generic.SizeOrderedPowerset.GenericSetsPickN;
 import org.spectrumauctions.sats.core.model.Bundle;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSGood;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -21,7 +21,7 @@ import java.util.Map.Entry;
  * @author Michael Weiss
  *
  */
-public class XORQtoXOR<T extends Good> implements Iterator<Bundle<T>> {
+public class XORQtoXOR<T extends SATSGood> implements Iterator<Bundle<T>> {
 
     private static final Logger logger = LogManager.getLogger(XORQtoXOR.class);
 
@@ -62,7 +62,7 @@ public class XORQtoXOR<T extends Good> implements Iterator<Bundle<T>> {
      */
     @Override
     public boolean hasNext() {
-        for (GenericSetsPickN<? extends Good> pickNiter : pickNiterators) {
+        for (GenericSetsPickN<? extends SATSGood> pickNiter : pickNiterators) {
             if (pickNiter.hasNext()) {
                 return true;
             }
@@ -118,7 +118,7 @@ public class XORQtoXOR<T extends Good> implements Iterator<Bundle<T>> {
         if (iteratorNumber >= orderOfDefs.size()) {
             logger.info("abort");
         }
-        for (Good good : orderOfDefs.get(iteratorNumber).allLicenses()) {
+        for (SATSGood good : orderOfDefs.get(iteratorNumber).allLicenses()) {
             try {
                 maxQuantities.put((T) good, 1);
             } catch (ClassCastException e) {

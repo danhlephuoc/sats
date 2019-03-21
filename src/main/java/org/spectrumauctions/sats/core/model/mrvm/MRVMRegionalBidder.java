@@ -7,7 +7,7 @@ package org.spectrumauctions.sats.core.model.mrvm;
 
 import com.google.common.base.Preconditions;
 import org.spectrumauctions.sats.core.bidlang.BiddingLanguage;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.Bundle;
 import org.spectrumauctions.sats.core.model.UnsupportedBiddingLanguageException;
 import org.spectrumauctions.sats.core.model.World;
@@ -96,12 +96,12 @@ public final class MRVMRegionalBidder extends MRVMBidder {
     }
 
     @Override
-    public Bidder<MRVMLicense> drawSimilarBidder(RNGSupplier rngSupplier) {
-        return new MRVMRegionalBidder(getId(), getPopulation(), getWorld(), (MRVMRegionalBidderSetup) getSetup(), rngSupplier.getUniformDistributionRNG());
+    public SATSBidder<MRVMLicense> drawSimilarBidder(RNGSupplier rngSupplier) {
+        return new MRVMRegionalBidder(getLongId(), getPopulation(), getWorld(), (MRVMRegionalBidderSetup) getSetup(), rngSupplier.getUniformDistributionRNG());
     }
 
     /* (non-Javadoc)
-     * @see Bidder#getValueFunctionRepresentation(java.lang.Class, long)
+     * @see SATSBidder#getValueFunctionRepresentation(java.lang.Class, long)
      */
     @Override
     public <T extends BiddingLanguage> T getValueFunction(Class<T> type, RNGSupplier rngSupplier)
@@ -110,7 +110,7 @@ public final class MRVMRegionalBidder extends MRVMBidder {
     }
 
     /* (non-Javadoc)
-     * @see Bidder#refreshReference(World)
+     * @see SATSBidder#refreshReference(World)
      */
     @Override
     public void refreshReference(World world) {

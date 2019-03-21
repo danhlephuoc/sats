@@ -6,11 +6,10 @@ import org.spectrumauctions.sats.core.bidlang.BiddingLanguage;
 import org.spectrumauctions.sats.core.bidlang.xor.DecreasingSizeOrderedXOR;
 import org.spectrumauctions.sats.core.bidlang.xor.IncreasingSizeOrderedXOR;
 import org.spectrumauctions.sats.core.bidlang.xor.SizeBasedUniqueRandomXOR;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.Bundle;
 import org.spectrumauctions.sats.core.model.UnsupportedBiddingLanguageException;
 import org.spectrumauctions.sats.core.model.World;
-import org.spectrumauctions.sats.core.util.random.JavaUtilRNGSupplier;
 import org.spectrumauctions.sats.core.util.random.RNGSupplier;
 
 import java.math.BigDecimal;
@@ -19,7 +18,7 @@ import java.util.*;
 /**
  * @author Fabio Isler
  */
-public final class LSVMBidder extends Bidder<LSVMLicense> {
+public final class LSVMBidder extends SATSBidder<LSVMLicense> {
 
     private static final long serialVersionUID = -1774118565772856391L;
     private final int LSVM_A;
@@ -61,8 +60,8 @@ public final class LSVMBidder extends Bidder<LSVMLicense> {
     private double sumOfItemValues(Set<LSVMLicense> subset) {
         double value = 0;
         for (LSVMLicense license : subset) {
-            if (this.values.containsKey(license.getId())) {
-                value += this.values.get(license.getId()).doubleValue();
+            if (this.values.containsKey(license.getLongId())) {
+                value += this.values.get(license.getLongId()).doubleValue();
             }
         }
         return value;
@@ -85,7 +84,7 @@ public final class LSVMBidder extends Bidder<LSVMLicense> {
     }
 
     /**
-     * @see Bidder#getWorld()
+     * @see SATSBidder#getWorld()
      */
     @Override
     public LSVMWorld getWorld() {
@@ -103,8 +102,8 @@ public final class LSVMBidder extends Bidder<LSVMLicense> {
     }
 
     @Override
-    public Bidder<LSVMLicense> drawSimilarBidder(RNGSupplier rngSupplier) {
-        return new LSVMBidder((LSVMBidderSetup) getSetup(), getWorld(), getId(), getPopulation(), rngSupplier);
+    public SATSBidder<LSVMLicense> drawSimilarBidder(RNGSupplier rngSupplier) {
+        return new LSVMBidder((LSVMBidderSetup) getSetup(), getWorld(), getLongId(), getPopulation(), rngSupplier);
     }
 
     public Map<Long, BigDecimal> getBaseValues() {

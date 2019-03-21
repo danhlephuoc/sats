@@ -9,12 +9,12 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import org.spectrumauctions.sats.core.bidlang.xor.XORValue;
 import org.spectrumauctions.sats.core.model.Bundle;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSGood;
 
 import java.math.BigDecimal;
 import java.util.*;
 
-public final class GenericValue<G extends GenericDefinition<S>, S extends Good> {
+public final class GenericValue<G extends GenericDefinition<S>, S extends SATSGood> {
 
     private transient final int id;
     private final int totalQuantity;
@@ -153,7 +153,7 @@ public final class GenericValue<G extends GenericDefinition<S>, S extends Good> 
         return id;
     }
 
-    public static class Builder<T extends GenericDefinition<S>, S extends Good> {
+    public static class Builder<T extends GenericDefinition<S>, S extends SATSGood> {
 
         private BigDecimal value;
         private GenericValueBidder<T> bidder;

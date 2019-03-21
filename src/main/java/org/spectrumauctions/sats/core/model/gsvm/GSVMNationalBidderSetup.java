@@ -23,7 +23,7 @@ public class GSVMNationalBidderSetup extends GSVMBidderSetup {
         HashMap<Long, BigDecimal> values = new HashMap<>();
         // Add all national licenses
         for (GSVMLicense license : world.getNationalCircle().getLicenses()) {
-            values.put(license.getId(), getValueDependingOnRegion(rng, license.getPosition(), world.getSize()));
+            values.put(license.getLongId(), getValueDependingOnRegion(rng, license.getPosition(), world.getSize()));
         }
         return values;
     }
@@ -34,7 +34,7 @@ public class GSVMNationalBidderSetup extends GSVMBidderSetup {
          * Create a BidderSetup Builder
          */
         public Builder() {
-            super("National Bidder Setup", 1,
+            super("National SATSBidder Setup", 1,
                     new DoubleInterval(0, 10), new DoubleInterval(0, 20), new DoubleInterval(0, 0));
         }
 

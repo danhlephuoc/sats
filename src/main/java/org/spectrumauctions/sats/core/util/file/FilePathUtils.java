@@ -146,7 +146,7 @@ public class FilePathUtils {
                     try {
                         ids.add(Long.valueOf(name));
                     } catch (NumberFormatException e) {
-                        throw new RuntimeException("Invalid Bidder File", e);
+                        throw new RuntimeException("Invalid SATSBidder File", e);
                     }
                 } else {
                     logger.warn("File which is not a bidder file here was found and ignored " + subFile.getName());

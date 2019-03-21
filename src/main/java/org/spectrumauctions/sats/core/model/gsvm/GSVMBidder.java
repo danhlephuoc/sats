@@ -5,11 +5,10 @@ import org.spectrumauctions.sats.core.bidlang.BiddingLanguage;
 import org.spectrumauctions.sats.core.bidlang.xor.DecreasingSizeOrderedXOR;
 import org.spectrumauctions.sats.core.bidlang.xor.IncreasingSizeOrderedXOR;
 import org.spectrumauctions.sats.core.bidlang.xor.SizeBasedUniqueRandomXOR;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.Bundle;
 import org.spectrumauctions.sats.core.model.UnsupportedBiddingLanguageException;
 import org.spectrumauctions.sats.core.model.World;
-import org.spectrumauctions.sats.core.util.random.JavaUtilRNGSupplier;
 import org.spectrumauctions.sats.core.util.random.RNGSupplier;
 
 import java.math.BigDecimal;
@@ -21,7 +20,7 @@ import java.util.Objects;
 /**
  * @author Fabio Isler
  */
-public final class GSVMBidder extends Bidder<GSVMLicense> {
+public final class GSVMBidder extends SATSBidder<GSVMLicense> {
 
     private static final long serialVersionUID = -7275733600491984673L;
     private final int bidderPosition;
@@ -41,8 +40,8 @@ public final class GSVMBidder extends Bidder<GSVMLicense> {
     public BigDecimal calculateValue(Bundle<GSVMLicense> bundle) {
         double value = 0;
         for (GSVMLicense license : bundle) {
-            if (this.values.containsKey(license.getId())) {
-                value += this.values.get(license.getId()).doubleValue();
+            if (this.values.containsKey(license.getLongId())) {
+                value += this.values.get(license.getLongId()).doubleValue();
             }
         }
         double factor = 0;
@@ -86,8 +85,8 @@ public final class GSVMBidder extends Bidder<GSVMLicense> {
     }
 
     @Override
-    public Bidder<GSVMLicense> drawSimilarBidder(RNGSupplier rngSupplier) {
-        return new GSVMBidder((GSVMBidderSetup) getSetup(), getWorld(), getBidderPosition(), getId(), getPopulation(), rngSupplier);
+    public SATSBidder<GSVMLicense> drawSimilarBidder(RNGSupplier rngSupplier) {
+        return new GSVMBidder((GSVMBidderSetup) getSetup(), getWorld(), getBidderPosition(), getLongId(), getPopulation(), rngSupplier);
     }
 
     @Override

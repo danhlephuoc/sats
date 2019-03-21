@@ -3,8 +3,8 @@ package org.spectrumauctions.sats.mechanism.domain;
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.collect.Maps;
-import org.spectrumauctions.sats.core.model.Bidder;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSBidder;
+import org.spectrumauctions.sats.core.model.SATSGood;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -14,15 +14,15 @@ import java.util.Set;
 /**
  * This class represents the Payment vector after a WinnerDetermination.
  */
-public final class Payment<T extends Good> {
-    private final Map<Bidder<T>, BidderPayment> payments;
+public final class Payment<T extends SATSGood> {
+    private final Map<SATSBidder<T>, BidderPayment> payments;
 
 
     /**
      * @param payments     Map of bidder to payments. One payment per bidder. Payment may
      *                     be 0 and allocation may of payment may be empty
      */
-    public Payment(Map<Bidder<T>, BidderPayment> payments) {
+    public Payment(Map<SATSBidder<T>, BidderPayment> payments) {
         this.payments = Collections.unmodifiableMap(payments);
     }
 
@@ -38,11 +38,11 @@ public final class Payment<T extends Good> {
         return payments.values();
     }
 
-    public Map<Bidder<T>, BidderPayment> getPaymentMap() {
+    public Map<SATSBidder<T>, BidderPayment> getPaymentMap() {
         return payments;
     }
 
-    public BidderPayment paymentOf(Bidder<T> bidder) {
+    public BidderPayment paymentOf(SATSBidder<T> bidder) {
         BidderPayment payment = payments.get(bidder);
         if (payment == null) {
             return new BidderPayment(0);
@@ -56,19 +56,19 @@ public final class Payment<T extends Good> {
         return "Payment[payments=" + payments + "]";
     }
 
-    public Set<Bidder<T>> getWinners() {
+    public Set<SATSBidder<T>> getWinners() {
         return payments.keySet();
     }
 
-    public boolean isWinner(Bidder<T> bidder) {
+    public boolean isWinner(SATSBidder<T> bidder) {
         return payments.containsKey(bidder);
     }
 
 
-    public static <T extends Good> Payment<T> getZeroPayment(Set<Bidder<T>> bidders) {
+    public static <T extends SATSGood> Payment<T> getZeroPayment(Set<SATSBidder<T>> bidders) {
         BidderPayment zeroBidderPayment = new BidderPayment(0);
         Function<Object, BidderPayment> zeroPaymentFunction = Functions.constant(zeroBidderPayment);
-        Map<Bidder<T>, BidderPayment> emptyPaymentMap = Maps.asMap(bidders, zeroPaymentFunction);
+        Map<SATSBidder<T>, BidderPayment> emptyPaymentMap = Maps.asMap(bidders, zeroPaymentFunction);
         return new Payment<T>(emptyPaymentMap);
     }
 

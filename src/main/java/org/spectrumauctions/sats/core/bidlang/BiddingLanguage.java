@@ -5,8 +5,8 @@
  */
 package org.spectrumauctions.sats.core.bidlang;
 
-import org.spectrumauctions.sats.core.model.Bidder;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSBidder;
+import org.spectrumauctions.sats.core.model.SATSGood;
 
 /**
  * Bidding languages represent a mean for the bidder to express a value for a certain set of goods.
@@ -28,8 +28,8 @@ import org.spectrumauctions.sats.core.model.Good;
 public interface BiddingLanguage {
 
     /**
-     * References back to the Bidder instance from whom this
+     * References back to the SATSBidder instance from whom this
      * Bidding language instance was created.
      */
-    Bidder<? extends Good> getBidder();
+    SATSBidder<? extends SATSGood> getBidder();
 }

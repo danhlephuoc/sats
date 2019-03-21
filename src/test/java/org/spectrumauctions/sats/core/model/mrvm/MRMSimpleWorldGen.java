@@ -47,7 +47,7 @@ public class MRMSimpleWorldGen {
 
     static MRVMLocalBidderSetup getSimpleLocalBidderSetup() {
         MRVMLocalBidderSetup.Builder builder = new MRVMLocalBidderSetup.Builder();
-        builder.setSetupName("Simple Local Bidder");
+        builder.setSetupName("Simple Local SATSBidder");
         builder.setNumberOfBidders(1);
         builder.setAlphaInterval(new DoubleInterval(0.4));
         builder.setBetaInterval(new DoubleInterval(0.5));
@@ -57,7 +57,7 @@ public class MRMSimpleWorldGen {
 
     static MRVMRegionalBidderSetup getSimpleRegionalBidderSetup() {
         MRVMRegionalBidderSetup.Builder builder = new MRVMRegionalBidderSetup.Builder();
-        builder.setSetupName("Simple Regional Bidder");
+        builder.setSetupName("Simple Regional SATSBidder");
         builder.setNumberOfBidders(1);
         builder.setAlphaInterval(new DoubleInterval(0.4));
         builder.setBetaInterval(new DoubleInterval(0.5));
@@ -67,7 +67,7 @@ public class MRMSimpleWorldGen {
 
     static MRVMNationalBidderSetup getSimpleGlobalBidderSetup() {
         MRVMNationalBidderSetup.Builder builder = new MRVMNationalBidderSetup.Builder();
-        builder.setSetupName("Simple Global Bidder");
+        builder.setSetupName("Simple Global SATSBidder");
         builder.setNumberOfBidders(1);
         builder.setAlphaInterval(new DoubleInterval(0.4));
         builder.setBetaInterval(new DoubleInterval(0.5));

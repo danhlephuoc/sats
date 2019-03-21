@@ -26,9 +26,9 @@ public class ModelMIPTest {
     @Test
     public void setAcceptSuboptimalSolutionAtTimeout() {
         MRVM_MIP mip = new MRVM_MIP(new MultiRegionModel().createNewPopulation(5413646L));
-        Assert.assertTrue(mip.getMip().getDoubleSolveParam(SolveParam.TIME_LIMIT) > 2);
+        Assert.assertTrue(mip.getMIP().getDoubleSolveParam(SolveParam.TIME_LIMIT) > 2);
         mip.setTimeLimit(2);
-        Assert.assertEquals(2, mip.getMip().getDoubleSolveParam(SolveParam.TIME_LIMIT), 1e-6);
+        Assert.assertEquals(2, mip.getMIP().getDoubleSolveParam(SolveParam.TIME_LIMIT), 1e-6);
         mip.calculateAllocation();
         logger.info("Successfully accepted suboptimal solution at timeout!");
     }
@@ -36,11 +36,11 @@ public class ModelMIPTest {
     @Test
     public void setAcceptNoSuboptimalSolutionAtTimeout() {
         MRVM_MIP mip = new MRVM_MIP(new MultiRegionModel().createNewPopulation(5413646L));
-        Assert.assertTrue(mip.getMip().getDoubleSolveParam(SolveParam.TIME_LIMIT) > 2);
+        Assert.assertTrue(mip.getMIP().getDoubleSolveParam(SolveParam.TIME_LIMIT) > 2);
         mip.setTimeLimit(2);
-        Assert.assertEquals(2, mip.getMip().getDoubleSolveParam(SolveParam.TIME_LIMIT), 1e-6);
+        Assert.assertEquals(2, mip.getMIP().getDoubleSolveParam(SolveParam.TIME_LIMIT), 1e-6);
         mip.setAcceptSuboptimal(false);
-        Assert.assertFalse(mip.getMip().getBooleanSolveParam(SolveParam.ACCEPT_SUBOPTIMAL));
+        Assert.assertFalse(mip.getMIP().getBooleanSolveParam(SolveParam.ACCEPT_SUBOPTIMAL));
         try {
             mip.calculateAllocation();
             fail("Should have timed out and thrown an error.");
@@ -58,8 +58,8 @@ public class ModelMIPTest {
     @Test
     public void setDisplayOutput() {
         MRVM_MIP mip = new MRVM_MIP(new MultiRegionModel().createNewPopulation(5413646L));
-        Assert.assertFalse(mip.getMip().getBooleanSolveParam(SolveParam.DISPLAY_OUTPUT));
+        Assert.assertFalse(mip.getMIP().getBooleanSolveParam(SolveParam.DISPLAY_OUTPUT));
         mip.setDisplayOutput(true);
-        Assert.assertTrue(mip.getMip().getBooleanSolveParam(SolveParam.DISPLAY_OUTPUT));
+        Assert.assertTrue(mip.getMIP().getBooleanSolveParam(SolveParam.DISPLAY_OUTPUT));
     }
 }

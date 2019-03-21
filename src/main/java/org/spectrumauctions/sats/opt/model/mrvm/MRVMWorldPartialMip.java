@@ -6,6 +6,7 @@
 package org.spectrumauctions.sats.opt.model.mrvm;
 
 import com.google.common.base.Preconditions;
+import edu.harvard.econcs.jopt.solver.IMIP;
 import edu.harvard.econcs.jopt.solver.mip.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -85,7 +86,7 @@ public class MRVMWorldPartialMip extends PartialMIP {
         for (MRVMBidder bidder : bidders) {
             String varName = new StringBuilder(valueVariablePrefix)
                     .append("_")
-                    .append(bidder.getId())
+                    .append(bidder.getLongId())
                     .toString();
             Variable var = new Variable(varName, VarType.DOUBLE, 0, MIP.MAX_VALUE);
             result.put(bidder, var);
@@ -112,7 +113,7 @@ public class MRVMWorldPartialMip extends PartialMIP {
         return Collections.unmodifiableMap(result);
     }
 
-    private void appendObjectiveToMip(MIP mip) {
+    private void appendObjectiveToMip(IMIP mip) {
         mip.setObjectiveMax(true);
 
         if (!mip.getObjectiveTerms().isEmpty()) {
@@ -128,7 +129,7 @@ public class MRVMWorldPartialMip extends PartialMIP {
      * Furthermore, this implementation of a PartialMip adds the objective term to the MIP
      */
     @Override
-    public void appendToMip(MIP mip) {
+    public void appendToMip(IMIP mip) {
         super.appendToMip(mip);
         appendObjectiveToMip(mip);
     }
@@ -138,7 +139,7 @@ public class MRVMWorldPartialMip extends PartialMIP {
      * @see PartialMIP#appendConstraintsToMip(edu.harvard.econcs.jopt.solver.mip.MIP)
      */
     @Override
-    public void appendConstraintsToMip(MIP mip) {
+    public void appendConstraintsToMip(IMIP mip) {
         super.appendConstraintsToMip(mip);
         for (Constraint c : createNumberOfLicensesConstraints()) {
             mip.add(c);
@@ -146,7 +147,7 @@ public class MRVMWorldPartialMip extends PartialMIP {
     }
 
     @Override
-    public void appendVariablesToMip(MIP mip) {
+    public void appendVariablesToMip(IMIP mip) {
         super.appendVariablesToMip(mip);
         for (Variable var : valueVariables.values()) {
             mip.add(var);

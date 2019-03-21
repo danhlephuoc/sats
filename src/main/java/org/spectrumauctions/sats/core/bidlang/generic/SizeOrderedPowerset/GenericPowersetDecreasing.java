@@ -7,7 +7,7 @@ package org.spectrumauctions.sats.core.bidlang.generic.SizeOrderedPowerset;
 
 import org.spectrumauctions.sats.core.bidlang.generic.GenericDefinition;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValue;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSGood;
 import org.spectrumauctions.sats.core.model.UnsupportedBiddingLanguageException;
 
 import java.util.Iterator;
@@ -18,7 +18,7 @@ import java.util.Map;
  * @author Michael Weiss
  *
  */
-public abstract class GenericPowersetDecreasing<T extends GenericDefinition<S>, S extends Good> extends GenericPowerset<T, S> {
+public abstract class GenericPowersetDecreasing<T extends GenericDefinition<S>, S extends SATSGood> extends GenericPowerset<T, S> {
 
 
     GenericPowersetDecreasing(Map<T, Integer> maxQuantities, int maxBundleSize) throws UnsupportedBiddingLanguageException {

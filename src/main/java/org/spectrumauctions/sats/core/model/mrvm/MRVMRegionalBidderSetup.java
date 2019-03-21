@@ -74,7 +74,7 @@ public class MRVMRegionalBidderSetup extends MRVMBidderSetup {
         public MRVMRegionsMap.Region predefinedHome;
 
         public Builder() {
-            super("Multi Region Model Regional Bidder",
+            super("Multi Region Model Regional SATSBidder",
                     4,
                     new DoubleInterval(500, 840),
                     new DoubleInterval(0.04, 0.1));

@@ -48,10 +48,10 @@ public class LSVM_DemandQueryMIP implements NonGenericDemandQueryMIP<LSVMLicense
         Preconditions.checkArgument(prices.size() == world.getLicenses().size());
         lsvmMip = new LSVMStandardMIP(Lists.newArrayList(bidder));
 
-        lsvmMip.getMip().setSolveParam(SolveParam.RELATIVE_OBJ_GAP, epsilon);
+        lsvmMip.getMIP().setSolveParam(SolveParam.RELATIVE_OBJ_GAP, epsilon);
         priceVar = new Variable("p", VarType.DOUBLE, 0, MIP.MAX_VALUE);
-        lsvmMip.getMip().add(priceVar);
-        lsvmMip.getMip().addObjectiveTerm(-1, priceVar);
+        lsvmMip.getMIP().add(priceVar);
+        lsvmMip.getMIP().addObjectiveTerm(-1, priceVar);
         Constraint price = new Constraint(CompareType.EQ, 0);
         price.addTerm(-1, priceVar);
         variableSetsOfInterest = new HashSet<>();
@@ -65,7 +65,7 @@ public class LSVM_DemandQueryMIP implements NonGenericDemandQueryMIP<LSVMLicense
             }
             variableSetsOfInterest.add(variablesOfInterest);
         }
-        lsvmMip.getMip().add(price);
+        lsvmMip.getMIP().add(price);
     }
 
     @Override
@@ -81,10 +81,10 @@ public class LSVM_DemandQueryMIP implements NonGenericDemandQueryMIP<LSVMLicense
             return Lists.newArrayList();
         }
 
-        lsvmMip.getMip().setSolveParam(SolveParam.SOLUTION_POOL_CAPACITY, numberOfResults);
-        lsvmMip.getMip().setSolveParam(SolveParam.SOLUTION_POOL_MODE, 4);
-        lsvmMip.getMip().setAdvancedVariablesOfInterest(variableSetsOfInterest);
-        IMIPResult mipResult = solver.solve(lsvmMip.getMip());
+        lsvmMip.getMIP().setSolveParam(SolveParam.SOLUTION_POOL_CAPACITY, numberOfResults);
+        lsvmMip.getMIP().setSolveParam(SolveParam.SOLUTION_POOL_MODE, 4);
+        lsvmMip.getMIP().setAdvancedVariablesOfInterest(variableSetsOfInterest);
+        IMIPResult mipResult = solver.solve(lsvmMip.getMIP());
         logger.debug("Result:\n{}", mipResult);
 
         List<LSVM_DemandQueryMipResult> results = new ArrayList<>();

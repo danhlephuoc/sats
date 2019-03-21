@@ -6,7 +6,7 @@
 package org.spectrumauctions.sats.core.model.mrvm;
 
 import org.spectrumauctions.sats.core.bidlang.BiddingLanguage;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.Bundle;
 import org.spectrumauctions.sats.core.model.UnsupportedBiddingLanguageException;
 import org.spectrumauctions.sats.core.util.random.RNGSupplier;
@@ -93,8 +93,8 @@ public final class MRVMLocalBidder extends MRVMBidder {
     }
 
     @Override
-    public Bidder<MRVMLicense> drawSimilarBidder(RNGSupplier rngSupplier) {
-        return new MRVMLocalBidder(getId(), getPopulation(), getWorld(), (MRVMLocalBidderSetup) getSetup(), rngSupplier.getUniformDistributionRNG());
+    public SATSBidder<MRVMLicense> drawSimilarBidder(RNGSupplier rngSupplier) {
+        return new MRVMLocalBidder(getLongId(), getPopulation(), getWorld(), (MRVMLocalBidderSetup) getSetup(), rngSupplier.getUniformDistributionRNG());
     }
 
     @Override

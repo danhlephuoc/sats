@@ -1,5 +1,7 @@
 package org.spectrumauctions.sats.opt.model.gsvm;
 
+import ch.uzh.ifi.ce.domain.Bidder;
+import ch.uzh.ifi.ce.domain.BidderAllocation;
 import com.google.common.base.Preconditions;
 import edu.harvard.econcs.jopt.solver.IMIPResult;
 import edu.harvard.econcs.jopt.solver.client.SolverClient;
@@ -7,13 +9,13 @@ import edu.harvard.econcs.jopt.solver.mip.CompareType;
 import edu.harvard.econcs.jopt.solver.mip.Constraint;
 import edu.harvard.econcs.jopt.solver.mip.VarType;
 import edu.harvard.econcs.jopt.solver.mip.Variable;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.Bundle;
 import org.spectrumauctions.sats.core.model.gsvm.GSVMBidder;
 import org.spectrumauctions.sats.core.model.gsvm.GSVMLicense;
 import org.spectrumauctions.sats.core.model.gsvm.GSVMWorld;
-import org.spectrumauctions.sats.opt.domain.ItemAllocation;
-import org.spectrumauctions.sats.opt.domain.ItemAllocation.ItemAllocationBuilder;
+import org.spectrumauctions.sats.opt.domain.ItemSATSAllocation;
+import org.spectrumauctions.sats.opt.domain.ItemSATSAllocation.ItemAllocationBuilder;
 import org.spectrumauctions.sats.opt.domain.WinnerDeterminator;
 import org.spectrumauctions.sats.opt.model.ModelMIP;
 
@@ -21,7 +23,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class GSVMStandardMIP extends ModelMIP implements WinnerDeterminator<GSVMLicense> {
+public class GSVMStandardMIP extends ModelMIP {
 
     private Map<GSVMBidder, Map<GSVMLicense, Map<Integer, Variable>>> gMap;
 	private Map<GSVMBidder, Map<GSVMLicense, Double>> valueMap;
@@ -49,24 +51,25 @@ public class GSVMStandardMIP extends ModelMIP implements WinnerDeterminator<GSVM
 		this.world = world;
 		tauHatMap = new HashMap<>();
 		valueMap = new HashMap<>();
-		getMip().setObjectiveMax(true);
+		this.getMIP().setObjectiveMax(true);
 		initValues();
 		initVariables();
 		build();
 	}
 
 	@Override
-	public WinnerDeterminator<GSVMLicense> getWdWithoutBidder(Bidder<GSVMLicense> bidder) {
-        Preconditions.checkArgument(population.contains(bidder));
-        return new GSVMStandardMIP(population.stream().filter(b -> !b.equals(bidder)).collect(Collectors.toList()));
+	public ModelMIP getMIPWithout(Bidder bidder) {
+		GSVMBidder gsvmBidder = (GSVMBidder) bidder;
+        Preconditions.checkArgument(population.contains(gsvmBidder));
+        return new GSVMStandardMIP(population.stream().filter(b -> !b.equals(gsvmBidder)).collect(Collectors.toList()));
 	}
 
 	@Override
-	public ItemAllocation<GSVMLicense> calculateAllocation() {
+	public ItemSATSAllocation<GSVMLicense> calculateAllocation() {
 		SolverClient solver = new SolverClient();
-		IMIPResult result = solver.solve(getMip());
+		IMIPResult result = solver.solve(this.getMIP());
 
-		Map<Bidder<GSVMLicense>, Bundle<GSVMLicense>> allocation = new HashMap<>();
+		Map<SATSBidder<GSVMLicense>, Bundle<GSVMLicense>> allocation = new HashMap<>();
 
 		for (GSVMBidder bidder : population) {
             Bundle<GSVMLicense> bundle = new Bundle<>();
@@ -102,13 +105,8 @@ public class GSVMStandardMIP extends ModelMIP implements WinnerDeterminator<GSVM
 	}
 
 	@Override
-	public WinnerDeterminator<GSVMLicense> copyOf() {
+	public ModelMIP copyOf() {
 		return new GSVMStandardMIP(population);
-	}
-
-	@Override
-	public void adjustPayoffs(Map<Bidder<GSVMLicense>, Double> payoffs) {
-		throw new UnsupportedOperationException("The GSVM MIP does not support CCG yet.");
 	}
 
 	private void build() {
@@ -118,7 +116,7 @@ public class GSVMStandardMIP extends ModelMIP implements WinnerDeterminator<GSVM
 	        for (GSVMLicense license : world.getLicenses()) {
                 if (allowAssigningLicensesWithZeroBasevalue || valueMap.get(bidder).get(license) > 0) {
                     for (int tau = 0; tau < tauHatMap.get(bidder); tau++) {
-                        getMip().addObjectiveTerm(calculateComplementarityMarkup(tau + 1) * valueMap.get(bidder).get(license), gMap.get(bidder).get(license).get(tau));
+                        this.getMIP().addObjectiveTerm(calculateComplementarityMarkup(tau + 1) * valueMap.get(bidder).get(license), gMap.get(bidder).get(license).get(tau));
                     }
                 }
             }
@@ -127,7 +125,7 @@ public class GSVMStandardMIP extends ModelMIP implements WinnerDeterminator<GSVM
 
 		// build Supply/Eval Constraint (1)
 		for (GSVMLicense license : world.getLicenses()) {
-			Constraint constraint = new Constraint(CompareType.LEQ, 1, "SupplyConstraint license=" + license.getId());
+			Constraint constraint = new Constraint(CompareType.LEQ, 1, "SupplyConstraint license=" + license.getLongId());
 			for (GSVMBidder bidder : population) {
 				if (allowAssigningLicensesWithZeroBasevalue || valueMap.get(bidder).get(license) > 0) {
 					for (int tau = 0; tau < tauHatMap.get(bidder); tau++) {
@@ -135,7 +133,7 @@ public class GSVMStandardMIP extends ModelMIP implements WinnerDeterminator<GSVM
 					}
 				}
 			}
-			getMip().add(constraint);
+			this.getMIP().add(constraint);
 		}
 
 		// build Tau Constraint (2)
@@ -157,7 +155,7 @@ public class GSVMStandardMIP extends ModelMIP implements WinnerDeterminator<GSVM
 						constraint.addTerm(-(tau + 1), gMap.get(bidder).get(j).get(tau));
 					}
 				}
-				getMip().add(constraint);
+				this.getMIP().add(constraint);
 			}
 		}
 	}
@@ -168,7 +166,7 @@ public class GSVMStandardMIP extends ModelMIP implements WinnerDeterminator<GSVM
 	        valueMap.put(bidder, new HashMap<>());
             int tauCounter = 0;
             for (GSVMLicense license : world.getLicenses()) {
-                BigDecimal val = bidder.getBaseValues().getOrDefault(license.getId(), BigDecimal.ZERO);
+                BigDecimal val = bidder.getBaseValues().getOrDefault(license.getLongId(), BigDecimal.ZERO);
                 if (allowAssigningLicensesWithZeroBasevalue || val.doubleValue() > 0) {
                     tauCounter++;
                 }
@@ -179,7 +177,7 @@ public class GSVMStandardMIP extends ModelMIP implements WinnerDeterminator<GSVM
 	}
 
 	private OptionalDouble getValue(int i, int j) {
-		return population.stream().filter(bidder -> bidder.getId() == i).mapToDouble(bidder -> {
+		return population.stream().filter(bidder -> bidder.getLongId() == i).mapToDouble(bidder -> {
 			BigDecimal val = bidder.getBaseValues().get((long) j);
 			return val == null ? 0 : val.doubleValue();
 		}).reduce((element, otherElement) -> {
@@ -196,8 +194,8 @@ public class GSVMStandardMIP extends ModelMIP implements WinnerDeterminator<GSVM
 				if (allowAssigningLicensesWithZeroBasevalue || valueMap.get(bidder).get(license) > 0) {
 				    gMap.get(bidder).put(license, new HashMap<>());
 					for (int tau = 0; tau < tauHatMap.get(bidder); tau++) {
-					    Variable var = new Variable("g_i[" + (int) bidder.getId() + "]j[" + (int) license.getId() + "]t[" + tau + "]", VarType.BOOLEAN, 0, 1);
-						getMip().add(var);
+					    Variable var = new Variable("g_i[" + (int) bidder.getLongId() + "]j[" + (int) license.getLongId() + "]t[" + tau + "]", VarType.BOOLEAN, 0, 1);
+						this.getMIP().add(var);
 						gMap.get(bidder).get(license).put(tau, var);
 					}
 				}

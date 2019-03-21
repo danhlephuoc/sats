@@ -7,7 +7,7 @@ package org.spectrumauctions.sats.opt.model.mrvm;
 
 import com.google.common.base.Preconditions;
 import edu.harvard.econcs.jopt.solver.mip.*;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.mrvm.MRVMBand;
 import org.spectrumauctions.sats.core.model.mrvm.MRVMNationalBidder;
 import org.spectrumauctions.sats.core.model.mrvm.MRVMRegionsMap.Region;
@@ -67,7 +67,7 @@ public class MRVMNationalBidderPartialMip extends MRVMBidderPartialMIP {
      * @return
      */
     private Variable createWIVariable() {
-        String name = W_i_VARIABLE_PREFIX.concat(String.valueOf(bidder.getId()));
+        String name = W_i_VARIABLE_PREFIX.concat(String.valueOf(bidder.getLongId()));
         int numberOfRegions = bidder.getWorld().getRegionsMap().getNumberOfRegions();
         return new Variable(name, VarType.INT, 0, numberOfRegions);
     }
@@ -84,9 +84,9 @@ public class MRVMNationalBidderPartialMip extends MRVMBidderPartialMIP {
         return result;
     }
 
-    static String createIndex(Bidder<?> bidder, Integer k) {
+    static String createIndex(SATSBidder<?> bidder, Integer k) {
         StringBuilder builder = new StringBuilder("_i");
-        builder.append(bidder.getId());
+        builder.append(bidder.getLongId());
         builder.append(",k");
         builder.append(k.toString());
         return builder.toString();

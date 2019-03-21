@@ -46,8 +46,8 @@ public class LSVMBidderTest {
 
         Assert.assertTrue(minimalPopulation.size() == 5);
 
-        Assert.assertTrue(minimalPopulation.get(0).getSetupType().equals("National Bidder Setup"));
-        Assert.assertTrue(minimalPopulation.get(4).getSetupType().equals("Regional Bidder Setup"));
+        Assert.assertTrue(minimalPopulation.get(0).getSetupType().equals("National SATSBidder Setup"));
+        Assert.assertTrue(minimalPopulation.get(4).getSetupType().equals("Regional SATSBidder Setup"));
     }
 
     /**
@@ -61,7 +61,7 @@ public class LSVMBidderTest {
         LSVMBidderSetup.RegionalBidderBuilder regionalBidderBuilder = new LSVMBidderSetup.RegionalBidderBuilder();
         regionalBidderBuilder.setProximitySize(1);
         regionalBidderBuilder.setNumberOfBidders(8);
-        regionalBidderBuilder.setSetupName("Test Regional Bidder");
+        regionalBidderBuilder.setSetupName("Test Regional SATSBidder");
         regionalBidderBuilder.setValueInterval(new DoubleInterval(10));
         regionalBidderBuilder.setLsvmA(0);
         regionalBidderBuilder.setLsvmB(5);
@@ -69,7 +69,7 @@ public class LSVMBidderTest {
         LSVMBidderSetup.NationalBidderBuilder nationalBidderBuilder = new LSVMBidderSetup.NationalBidderBuilder();
         nationalBidderBuilder.setNumberOfBidders(2);
         nationalBidderBuilder.setValueInterval(new DoubleInterval(4));
-        nationalBidderBuilder.setSetupName("Test National Bidder");
+        nationalBidderBuilder.setSetupName("Test National SATSBidder");
 
         List<LSVMBidderSetup> setups = new ArrayList<>();
         setups.add(regionalBidderBuilder.build());
@@ -78,9 +78,9 @@ public class LSVMBidderTest {
 
         Assert.assertTrue(customPopulation.size() == 10);
 
-        Assert.assertTrue(customPopulation.get(0).getSetupType().equals("Test Regional Bidder"));
+        Assert.assertTrue(customPopulation.get(0).getSetupType().equals("Test Regional SATSBidder"));
 
-        Assert.assertTrue(customPopulation.get(9).getSetupType().equals("Test National Bidder"));
+        Assert.assertTrue(customPopulation.get(9).getSetupType().equals("Test National SATSBidder"));
 
         Bundle<LSVMLicense> proximity = new Bundle<>();
         proximity.addAll(customPopulation.get(0).getProximity());

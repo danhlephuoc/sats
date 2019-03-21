@@ -10,7 +10,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericDefinition;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSGood;
 
 import java.util.Set;
 
@@ -54,7 +54,7 @@ public final class MRVMGenericDefinition implements GenericDefinition<MRVMLicens
     }
 
     /**
-     * @see GenericDefinition#isPartOf(Good)
+     * @see GenericDefinition#isPartOf(SATSGood)
      */
     @Override
     public boolean isPartOf(MRVMLicense license) {

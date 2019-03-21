@@ -9,8 +9,8 @@ import org.spectrumauctions.sats.core.bidlang.generic.GenericValueBidder;
 import org.spectrumauctions.sats.core.bidlang.generic.SizeOrderedPowerset.GenericPowerset;
 import org.spectrumauctions.sats.core.bidlang.generic.SizeOrderedPowerset.GenericPowersetDecreasing;
 import org.spectrumauctions.sats.core.bidlang.generic.SizeOrderedPowerset.GenericPowersetIncreasing;
-import org.spectrumauctions.sats.core.model.Bidder;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSBidder;
+import org.spectrumauctions.sats.core.model.SATSGood;
 import org.spectrumauctions.sats.core.model.UnsupportedBiddingLanguageException;
 
 import java.util.ArrayList;
@@ -70,7 +70,7 @@ public class SizeOrderedGenericPowersetFactory {
         }
 
         @Override
-        public Bidder<? extends Good> getBidder() {
+        public SATSBidder<? extends SATSGood> getBidder() {
             return bidder;
         }
 

@@ -14,25 +14,26 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public abstract class Bidder<G extends Good> implements Serializable {
+public abstract class SATSBidder<G extends SATSGood> extends ch.uzh.ifi.ce.domain.Bidder implements Serializable {
 
     private static final long serialVersionUID = 3424512863538320455L;
     private final String setupType;
     private final long population;
-    private final long id;
+    private final long longId;
     private final long worldId;
     private final BidderSetup setup;
 
-    protected Bidder(BidderSetup setup, long population, long id, long worldId) {
+    protected SATSBidder(BidderSetup setup, long population, long longId, long worldId) {
+        super(String.valueOf(longId));
         this.setup = setup;
         this.setupType = setup.getSetupName();
-        this.id = id;
+        this.longId = longId;
         this.population = population;
         this.worldId = worldId;
     }
 
-    public long getId() {
-        return id;
+    public long getLongId() {
+        return longId;
     }
 
 
@@ -120,7 +121,7 @@ public abstract class Bidder<G extends Good> implements Serializable {
 
     /**
      * @return World to which this bidder belongs.
-     * The implementing Bidder class, overriding this method,
+     * The implementing SATSBidder class, overriding this method,
      * should return a world type corresponding to the specific model.
      */
     public abstract World getWorld();
@@ -142,13 +143,13 @@ public abstract class Bidder<G extends Good> implements Serializable {
         return worldId;
     }
 
-    public abstract Bidder<G> drawSimilarBidder(RNGSupplier rngSupplier);
+    public abstract SATSBidder<G> drawSimilarBidder(RNGSupplier rngSupplier);
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (int) (id ^ (id >>> 32));
+        result = prime * result + (int) (longId ^ (longId >>> 32));
         result = prime * result + ((setupType == null) ? 0 : setupType.hashCode());
         return result;
     }
@@ -161,8 +162,8 @@ public abstract class Bidder<G extends Good> implements Serializable {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Bidder<?> other = (Bidder<?>) obj;
-        if (id != other.id)
+        SATSBidder<?> other = (SATSBidder<?>) obj;
+        if (longId != other.longId)
             return false;
         if (setupType == null) {
             if (other.setupType != null)

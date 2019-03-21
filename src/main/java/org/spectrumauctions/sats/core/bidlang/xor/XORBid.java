@@ -1,20 +1,19 @@
 package org.spectrumauctions.sats.core.bidlang.xor;
 
 
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.Bundle;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSGood;
 import org.spectrumauctions.sats.core.model.UnequalWorldsException;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public final class XORBid<T extends Good> {
+public final class XORBid<T extends SATSGood> {
 
-    private final Bidder<T> bidder;
+    private final SATSBidder<T> bidder;
     private final List<XORValue<T>> values;
 
     private XORBid(Builder<T> builder) {
@@ -41,7 +40,7 @@ public final class XORBid<T extends Good> {
     /**
      * @return The bidder for which this bid
      */
-    public Bidder<T> getBidder() {
+    public SATSBidder<T> getBidder() {
         return bidder;
     }
 
@@ -84,17 +83,17 @@ public final class XORBid<T extends Good> {
      * @param <T> The type of Goods in the atomic XORValues
      * @author Michael Weiss
      */
-    public static final class Builder<T extends Good> extends ArrayList<XORValue<T>> {
+    public static final class Builder<T extends SATSGood> extends ArrayList<XORValue<T>> {
 
 
         private static final long serialVersionUID = -6540446139983915994L;
 
-        private final Bidder<T> bidder;
+        private final SATSBidder<T> bidder;
 
         /**
          * @param bidder the bidder this bid belongs to
          */
-        public Builder(Bidder<T> bidder) {
+        public Builder(SATSBidder<T> bidder) {
             super();
             this.bidder = bidder;
         }
@@ -116,7 +115,7 @@ public final class XORBid<T extends Good> {
          * @param bidder the bidder this bid belongs to
          * @param values initial XORValues to be added to this builder, as specified in {@link ArrayList#ArrayList(Collection)}
          */
-        public Builder(Bidder<T> bidder, Collection<? extends XORValue<T>> values) {
+        public Builder(SATSBidder<T> bidder, Collection<? extends XORValue<T>> values) {
             super(values);
             this.bidder = bidder;
         }

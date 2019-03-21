@@ -5,25 +5,20 @@ import org.spectrumauctions.sats.core.bidlang.generic.GenericBid;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericDefinition;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValue;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValueBidder;
-import org.spectrumauctions.sats.core.model.Bidder;
-import org.spectrumauctions.sats.core.model.Good;
+import org.spectrumauctions.sats.core.model.SATSBidder;
+import org.spectrumauctions.sats.core.model.SATSGood;
 import org.spectrumauctions.sats.mechanism.cca.GenericCCAMechanism;
-import org.spectrumauctions.sats.opt.domain.GenericDemandQueryMIP;
-import org.spectrumauctions.sats.opt.domain.GenericDemandQueryMIPBuilder;
-import org.spectrumauctions.sats.opt.domain.GenericDemandQueryResult;
 
-import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
-public class LastBidsTrueValueGenericSupplementaryRound<G extends GenericDefinition<T>, T extends Good> implements GenericSupplementaryRound<G, T> {
+public class LastBidsTrueValueGenericSupplementaryRound<G extends GenericDefinition<T>, T extends SATSGood> implements GenericSupplementaryRound<G, T> {
 
     private static final int DEFAULT_NUMBER_OF_SUPPLEMENTARY_BIDS = 500;
 
     private int numberOfSupplementaryBids = DEFAULT_NUMBER_OF_SUPPLEMENTARY_BIDS;
 
     @Override
-    public List<GenericValue<G, T>> getSupplementaryBids(GenericCCAMechanism<G, T> cca, Bidder<T> bidder) {
+    public List<GenericValue<G, T>> getSupplementaryBids(GenericCCAMechanism<G, T> cca, SATSBidder<T> bidder) {
         Preconditions.checkArgument(bidder instanceof GenericValueBidder);
         GenericValueBidder<G> genericBidder = (GenericValueBidder<G>) bidder;
         GenericBid<G, T> bid = cca.getBidAfterClockPhase(bidder);

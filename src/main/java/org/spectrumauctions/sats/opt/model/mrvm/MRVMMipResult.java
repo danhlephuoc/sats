@@ -7,12 +7,11 @@ package org.spectrumauctions.sats.opt.model.mrvm;
 
 import edu.harvard.econcs.jopt.solver.IMIPResult;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValue;
-import org.spectrumauctions.sats.core.model.Bidder;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.mrvm.*;
 import org.spectrumauctions.sats.core.model.mrvm.MRVMRegionsMap.Region;
-import org.spectrumauctions.sats.opt.domain.GenericAllocation;
+import org.spectrumauctions.sats.opt.domain.GenericSATSAllocation;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,7 +22,7 @@ import java.util.Map.Entry;
  * @author Michael Weiss
  *
  */
-public final class MRVMMipResult extends GenericAllocation<MRVMGenericDefinition, MRVMLicense> {
+public final class MRVMMipResult extends GenericSATSAllocation<MRVMGenericDefinition, MRVMLicense> {
 
     private final MRVMWorld world;
 
@@ -48,15 +47,15 @@ public final class MRVMMipResult extends GenericAllocation<MRVMGenericDefinition
         String tab = "\t";
         StringBuilder builder = new StringBuilder();
 
-        List<Entry<Bidder<MRVMLicense>, GenericValue<MRVMGenericDefinition, MRVMLicense>>> sortedEntries = new ArrayList<>(values.entrySet());
-        Collections.sort(sortedEntries, Comparator.comparing(e -> ((Long) e.getKey().getId())));
+        List<Entry<SATSBidder<MRVMLicense>, GenericValue<MRVMGenericDefinition, MRVMLicense>>> sortedEntries = new ArrayList<>(values.entrySet());
+        Collections.sort(sortedEntries, Comparator.comparing(e -> ((Long) e.getKey().getLongId())));
 
 
         builder.append("===== bidder listing =======").append(System.lineSeparator());
-        for (Entry<Bidder<MRVMLicense>, GenericValue<MRVMGenericDefinition, MRVMLicense>> entry : sortedEntries) {
+        for (Entry<SATSBidder<MRVMLicense>, GenericValue<MRVMGenericDefinition, MRVMLicense>> entry : sortedEntries) {
             MRVMBidder bidder = (MRVMBidder) entry.getKey();
 
-            builder.append(entry.getKey().getId())
+            builder.append(entry.getKey().getLongId())
                     .append(tab)
                     .append(entry.getKey().getClass().getSimpleName())
                     .append("(")
@@ -91,12 +90,12 @@ public final class MRVMMipResult extends GenericAllocation<MRVMGenericDefinition
                         .append(")")
                         .append(System.lineSeparator());
                 //Print allocation in reguin
-                for (Entry<Bidder<MRVMLicense>, GenericValue<MRVMGenericDefinition, MRVMLicense>> entry : sortedEntries) {
+                for (Entry<SATSBidder<MRVMLicense>, GenericValue<MRVMGenericDefinition, MRVMLicense>> entry : sortedEntries) {
                     builder.append(tab);
                     for (MRVMBand band : orderedBands) {
                         MRVMGenericDefinition def = new MRVMGenericDefinition(band, region);
                         int quantity = entry.getValue().getQuantity(def);
-//                        builder.append(entry.getKey().getId())
+//                        builder.append(entry.getKey().getLongId())
 //                        .append(":")
                         builder.append(quantity)
                                 .append(tab)
@@ -105,7 +104,7 @@ public final class MRVMMipResult extends GenericAllocation<MRVMGenericDefinition
                     }
                     MRVMBidder bidder = (MRVMBidder) entry.getKey();
                     builder.append(entry.getKey().getClass().getSimpleName())
-                            .append(entry.getKey().getId())
+                            .append(entry.getKey().getLongId())
                             .append(" (")
                             .append(bidder.getSetupType())
                             .append(")");
@@ -118,7 +117,7 @@ public final class MRVMMipResult extends GenericAllocation<MRVMGenericDefinition
         return builder.toString();
     }
 
-    public static final class Builder extends GenericAllocation.Builder<MRVMGenericDefinition, MRVMLicense> {
+    public static final class Builder extends GenericSATSAllocation.Builder<MRVMGenericDefinition, MRVMLicense> {
 
 
         private MRVMWorld world;
