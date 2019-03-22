@@ -5,6 +5,8 @@
  */
 package org.spectrumauctions.sats.opt.domain;
 
+import ch.uzh.ifi.ce.domain.*;
+import ch.uzh.ifi.ce.mechanisms.MetaInfo;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import org.apache.logging.log4j.LogManager;
@@ -16,21 +18,20 @@ import org.spectrumauctions.sats.core.model.Bundle;
 import org.spectrumauctions.sats.core.model.SATSGood;
 
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Michael Weiss
  *
  */
-public class GenericSATSAllocation<T extends GenericDefinition<S>, S extends SATSGood> implements SATSAllocation<S> {
+public class GenericSATSAllocation<T extends GenericDefinition<S>, S extends SATSGood> extends Allocation implements SATSAllocation<S> {
 
     private static final Logger logger = LogManager.getLogger(GenericSATSAllocation.class);
 
     protected final ImmutableMap<SATSBidder<S>, GenericValue<T, S>> values;
 
     public GenericSATSAllocation(Builder<T, S> builder) {
+        super(builder.generalizedValues, new Bids(), builder.metaInfo);
         this.values = ImmutableMap.copyOf(builder.storedValues);
     }
 
@@ -48,14 +49,6 @@ public class GenericSATSAllocation<T extends GenericDefinition<S>, S extends SAT
 
     public GenericValue<T, S> getGenericAllocation(SATSBidder<S> bidder) {
         return values.get(bidder);
-    }
-
-    /* (non-Javadoc)
-     * @see SATSAllocation#getWinners()
-     */
-    @Override
-    public Collection<SATSBidder<S>> getWinners() {
-        return values.keySet();
     }
 
     @Override
@@ -94,15 +87,25 @@ public class GenericSATSAllocation<T extends GenericDefinition<S>, S extends SAT
     public static class Builder<G extends GenericDefinition<T>, T extends SATSGood> {
 
         private Map<SATSBidder<T>, GenericValue<G, T>> storedValues;
+        private Map<Bidder, BidderAllocation> generalizedValues;
+        private MetaInfo metaInfo;
 
         public Builder() {
             this.storedValues = new HashMap<>();
+        }
+        public Builder(MetaInfo metaInfo) {
+            this();
+            this.metaInfo = metaInfo;
         }
 
         public void putGenericValue(SATSBidder<T> bidder, GenericValue<G, T> value) {
             Preconditions.checkNotNull(bidder);
             Preconditions.checkNotNull(value);
             storedValues.put(bidder, value);
+            Map<Good, Integer> quantities = new HashMap<>();
+            value.getQuantities().forEach((g, q) -> quantities.put((Good) g, q));
+            BidderAllocation bidderAllocation = new BidderAllocation(value.getValue(), quantities, Collections.emptySet());
+            generalizedValues.put(bidder, bidderAllocation);
         }
     }
 

@@ -5,6 +5,7 @@
  */
 package org.spectrumauctions.sats.opt.model.srvm;
 
+import ch.uzh.ifi.ce.mechanisms.winnerdetermination.WinnerDetermination;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
@@ -26,8 +27,8 @@ public class SRVMMipTest {
     @Test
     public void testNoException() {
         Collection<SRVMBidder> bidders = (new SingleRegionModel()).createNewPopulation();
-        SRVM_MIP mip = new SRVM_MIP(bidders);
-        SRVMMipResult result = mip.calculateAllocation();
+        WinnerDetermination mip = new SRVM_MIP(bidders);
+        SRVMMipResult result = (SRVMMipResult) mip.getAllocation(); // FIXME
         for (SRVMBidder bidder : bidders) {
             GenericValue<SRVMBand, SRVMLicense> genVal = result.getGenericAllocation(bidder);
             for (SRVMBand band : bidder.getWorld().getBands()) {
@@ -55,7 +56,7 @@ public class SRVMMipTest {
         setups.addAll(SRVMWorldGen.getSimpleHighFrequencyBidderSetup(numberOfHighfrequencyBidders));
         Collection<SRVMBidder> bidders = world.createPopulation(setups, new JavaUtilRNGSupplier(963852741L));
         SRVM_MIP mip = new SRVM_MIP(bidders);
-        SRVMMipResult result = mip.calculateAllocation();
+        SRVMMipResult result = (SRVMMipResult) mip.getAllocation(); // FIXME
         for (SRVMBidder bidder : bidders) {
             GenericValue<SRVMBand, SRVMLicense> genVal = result.getGenericAllocation(bidder);
             for (SRVMBand band : bidder.getWorld().getBands()) {

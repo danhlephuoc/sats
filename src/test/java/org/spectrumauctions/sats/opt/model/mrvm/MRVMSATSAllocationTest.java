@@ -1,5 +1,6 @@
 package org.spectrumauctions.sats.opt.model.mrvm;
 
+import ch.uzh.ifi.ce.mechanisms.winnerdetermination.WinnerDetermination;
 import org.junit.Assert;
 import org.junit.Test;
 import org.spectrumauctions.sats.core.model.mrvm.MRVMBidder;
@@ -15,14 +16,14 @@ public class MRVMSATSAllocationTest {
         MultiRegionModel model = new MultiRegionModel();
         MRVMWorld world =  model.createWorld(1234567);
         List<MRVMBidder> biddersList = model.createPopulation(world, 1234567);
-        MRVM_MIP mip = new MRVM_MIP(biddersList);
-        mip.setDisplayOutput(true);
-        MRVMMipResult result1 = mip.calculateAllocation();
-        MRVMMipResult result2 = mip.calculateAllocation();
+        WinnerDetermination mip = new MRVM_MIP(biddersList);
+        // mip.setDisplayOutput(true); FIXME
+        MRVMMipResult result1 = (MRVMMipResult) mip.getAllocation();
+        MRVMMipResult result2 = (MRVMMipResult) mip.getAllocation();
         for (MRVMBidder bidder : biddersList) {
             Assert.assertEquals(result1.getGenericAllocation(bidder).getTotalQuantity(), result2.getGenericAllocation(bidder).getTotalQuantity());
         }
-        Assert.assertEquals(result1.getTotalValue(), result2.getTotalValue());
+        Assert.assertEquals(result1.getTotalAllocationValue(), result2.getTotalAllocationValue());
     }
 
     @Test
@@ -30,12 +31,12 @@ public class MRVMSATSAllocationTest {
         MultiRegionModel model = new MultiRegionModel();
         MRVMWorld world =  model.createWorld(1234567);
         List<MRVMBidder> biddersList = model.createPopulation(world, 1234567);
-        MRVM_MIP mip1 = new MRVM_MIP(biddersList);
-        mip1.setDisplayOutput(true);
-        MRVM_MIP mip2 = new MRVM_MIP(biddersList);
-        mip2.setDisplayOutput(true);
-        MRVMMipResult result1 = mip1.calculateAllocation();
-        MRVMMipResult result2 = mip2.calculateAllocation();
+        WinnerDetermination mip1 = new MRVM_MIP(biddersList);
+        // mip1.setDisplayOutput(true); FIXME
+        WinnerDetermination mip2 = new MRVM_MIP(biddersList);
+        // mip2.setDisplayOutput(true); FIXME
+        MRVMMipResult result1 = (MRVMMipResult) mip1.getAllocation(); // FIXME
+        MRVMMipResult result2 = (MRVMMipResult) mip2.getAllocation(); // FIXME
         for (MRVMBidder bidder : biddersList) {
             Assert.assertEquals(result1.getGenericAllocation(bidder).getTotalQuantity(), result2.getGenericAllocation(bidder).getTotalQuantity());
         }

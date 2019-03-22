@@ -59,7 +59,7 @@ public class VCGMechanism<T extends SATSGood> implements AuctionMechanism<T> {
         SATSAllocation<T> baseAllocation = baseWD.calculateAllocation();
 
         Map<SATSBidder<T>, BidderPayment> payments = new HashMap<>();
-        for (SATSBidder<T> bidder : baseAllocation.getWinners()) {
+        for (SATSBidder<T> bidder : baseAllocation.getWinnersOld()) {
 
             double baseAllocationTotalValue = baseAllocation.getTotalValue().doubleValue();
             double baseAllocationBidderValue = baseAllocation.getTradeValue(bidder).doubleValue();

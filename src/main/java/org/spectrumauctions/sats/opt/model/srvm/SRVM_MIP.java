@@ -7,7 +7,7 @@ package org.spectrumauctions.sats.opt.model.srvm;
 
 import ch.uzh.ifi.ce.domain.Bidder;
 import com.google.common.base.Preconditions;
-import edu.harvard.econcs.jopt.solver.IMIPResult;
+import edu.harvard.econcs.jopt.solver.ISolution;
 import edu.harvard.econcs.jopt.solver.SolveParam;
 import edu.harvard.econcs.jopt.solver.client.SolverClient;
 import edu.harvard.econcs.jopt.solver.mip.Constraint;
@@ -16,13 +16,11 @@ import edu.harvard.econcs.jopt.solver.mip.Variable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValue;
-import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.Bundle;
 import org.spectrumauctions.sats.core.model.srvm.SRVMBand;
 import org.spectrumauctions.sats.core.model.srvm.SRVMBidder;
 import org.spectrumauctions.sats.core.model.srvm.SRVMLicense;
 import org.spectrumauctions.sats.core.model.srvm.SRVMWorld;
-import org.spectrumauctions.sats.opt.domain.WinnerDeterminator;
 import org.spectrumauctions.sats.opt.model.ModelMIP;
 
 import java.math.BigDecimal;
@@ -119,19 +117,18 @@ public class SRVM_MIP extends ModelMIP {
      * @see EfficientAllocator#calculateEfficientAllocation()
      */
     @Override
-    public SRVMMipResult calculateAllocation() {
-        IMIPResult mipResult = SOLVER.solve(getMIP());
+    public SRVMMipResult adaptMIPResult(ISolution solution) {
         if (PRINT_SOLVER_RESULT) {
-            logger.info("Result:\n" + mipResult);
+            logger.info("Result:\n" + solution);
         }
-        SRVMMipResult.Builder resultBuilder = new SRVMMipResult.Builder(world, mipResult);
+        SRVMMipResult.Builder resultBuilder = new SRVMMipResult.Builder(world, solution);
         for (SRVMBidder bidder : bidderPartialMips.keySet()) {
             double unscaledValue = 0;
             for (SRVMBand band : world.getBands()) {
                 Variable bidderVmVar = worldPartialMip.getVmVariable(bidder, band);
-                double mipVmUtilityResult = mipResult.getValue(bidderVmVar);
+                double mipVmUtilityResult = solution.getValue(bidderVmVar);
                 Variable bidderVoVar = worldPartialMip.getVoVariable(bidder, band);
-                double mipVoUtilityResult = mipResult.getValue(bidderVoVar);
+                double mipVoUtilityResult = solution.getValue(bidderVoVar);
                 double value = bidder.getInterbandSynergyValue().floatValue() * mipVmUtilityResult + mipVoUtilityResult;
                 unscaledValue = value * worldPartialMip.getScalingFactor();
             }
@@ -139,7 +136,7 @@ public class SRVM_MIP extends ModelMIP {
             GenericValue.Builder<SRVMBand, SRVMLicense> valueBuilder = new GenericValue.Builder<>(BigDecimal.valueOf(unscaledValue));
             for (SRVMBand band : world.getBands()) {
                 Variable xVar = worldPartialMip.getXVariable(bidder, band);
-                double doubleQuantity = mipResult.getValue(xVar);
+                double doubleQuantity = solution.getValue(xVar);
                 int quantity = (int) Math.round(doubleQuantity);
                 valueBuilder.putQuantity(band, quantity);
             }

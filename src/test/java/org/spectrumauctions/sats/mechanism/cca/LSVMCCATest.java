@@ -1,7 +1,8 @@
 package org.spectrumauctions.sats.mechanism.cca;
 
+import ch.uzh.ifi.ce.domain.Allocation;
+import ch.uzh.ifi.ce.mechanisms.winnerdetermination.WinnerDetermination;
 import com.google.common.collect.Lists;
-import edu.harvard.econcs.jopt.solver.SolveParam;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Ignore;
@@ -26,9 +27,7 @@ import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class LSVMCCATest {
 
@@ -48,8 +47,8 @@ public class LSVMCCATest {
     private void testClockPhaseVsSupplementaryPhaseEfficiency() {
         List<LSVMBidder> rawBidders = new LocalSynergyValueModel().createNewPopulation();
         LSVMStandardMIP mip = new LSVMStandardMIP(Lists.newArrayList(rawBidders));
-        mip.getMIP().setSolveParam(SolveParam.RELATIVE_OBJ_GAP, 1e-5);
-        ItemSATSAllocation<LSVMLicense> efficientAllocation = mip.calculateAllocation();
+        mip.setEpsilon(1e-5);
+        ItemSATSAllocation<LSVMLicense> efficientAllocation = (ItemSATSAllocation<LSVMLicense>) mip.getAllocation();
         SATSAllocation<LSVMLicense> efficientAllocationWithTrueValues = efficientAllocation.getAllocationWithTrueValues();
         double diff = efficientAllocation.getTotalValue().doubleValue() - efficientAllocationWithTrueValues.getTotalValue().doubleValue();
         assertTrue(diff > -1e-6 && diff < 1e-6);
@@ -242,7 +241,7 @@ public class LSVMCCATest {
                 assertEquals(firstAllocationTrueValues.getTradeValue(bidder), allocationTrueValues.getTradeValue(bidder));
             }
             assertEquals(firstAllocationTrueValues.getTotalValue(), allocationTrueValues.getTotalValue());
-            assertEquals(firstAllocationTrueValues.getWinners(), allocationTrueValues.getWinners());
+            assertEquals(firstAllocationTrueValues.getWinnersOld(), allocationTrueValues.getWinnersOld());
         }
     }
 

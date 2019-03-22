@@ -29,7 +29,7 @@ public class ModelMIPTest {
         Assert.assertTrue(mip.getMIP().getDoubleSolveParam(SolveParam.TIME_LIMIT) > 2);
         mip.setTimeLimit(2);
         Assert.assertEquals(2, mip.getMIP().getDoubleSolveParam(SolveParam.TIME_LIMIT), 1e-6);
-        mip.calculateAllocation();
+        mip.getAllocation();
         logger.info("Successfully accepted suboptimal solution at timeout!");
     }
 
@@ -42,7 +42,7 @@ public class ModelMIPTest {
         mip.setAcceptSuboptimal(false);
         Assert.assertFalse(mip.getMIP().getBooleanSolveParam(SolveParam.ACCEPT_SUBOPTIMAL));
         try {
-            mip.calculateAllocation();
+            mip.getAllocation();
             fail("Should have timed out and thrown an error.");
         } catch (MIPException e) {
             if (e.getMessage().contains("suboptimal")) {

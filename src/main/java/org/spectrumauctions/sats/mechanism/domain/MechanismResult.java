@@ -7,6 +7,7 @@ import org.spectrumauctions.sats.opt.domain.SATSAllocation;
  * This class represents the result of an Auction, consisting of
  * an SATSAllocation and a Payment vector.
  */
+// FIXME: Remove this when not used anymore
 public class MechanismResult<T extends SATSGood> {
     private final Payment<T> payment;
     private final SATSAllocation<T> allocation;

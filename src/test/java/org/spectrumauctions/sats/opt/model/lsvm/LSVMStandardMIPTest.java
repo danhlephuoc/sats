@@ -1,5 +1,8 @@
 package org.spectrumauctions.sats.opt.model.lsvm;
 
+import ch.uzh.ifi.ce.domain.Allocation;
+import ch.uzh.ifi.ce.domain.Good;
+import ch.uzh.ifi.ce.mechanisms.winnerdetermination.WinnerDetermination;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,12 +11,12 @@ import org.spectrumauctions.sats.core.model.lsvm.*;
 import org.spectrumauctions.sats.core.util.random.DoubleInterval;
 import org.spectrumauctions.sats.core.util.random.IntegerInterval;
 import org.spectrumauctions.sats.core.util.random.JavaUtilRNGSupplier;
-import org.spectrumauctions.sats.opt.domain.ItemSATSAllocation;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This class provides some basic unit tests for the LSVMStandardMIP
@@ -57,8 +60,8 @@ public class LSVMStandardMIPTest {
 		LSVMWorld world = new LSVMWorld(setup, new JavaUtilRNGSupplier(983742L));
 		List<LSVMBidder> population = customPopulation(world, 2, 1);
 
-		LSVMStandardMIP lsvmMIP = new LSVMStandardMIP(world, population);
-		ItemSATSAllocation<LSVMLicense> allocation = lsvmMIP.calculateAllocation();
+		WinnerDetermination lsvmMIP = new LSVMStandardMIP(world, population);
+		Allocation allocation = lsvmMIP.getAllocation();
 
 		testTotalValue(population, allocation);
 	}
@@ -68,25 +71,27 @@ public class LSVMStandardMIPTest {
 		LSVMWorld world = model.createWorld(seed);
 		List<LSVMBidder> population = model.createPopulation(world, seed);
 
-		LSVMStandardMIP lsvmMIP = new LSVMStandardMIP(world, population);
-		ItemSATSAllocation<LSVMLicense> allocation = lsvmMIP.calculateAllocation();
+		WinnerDetermination lsvmMIP = new LSVMStandardMIP(world, population);
+		Allocation allocation = lsvmMIP.getAllocation();
 
 		Assert.assertEquals("Error Objective Value not matching Test Data Seed: " + seed, seedMap.get(seed),
-				allocation.getTotalValue().doubleValue(), 0.0000001);
+				allocation.getTotalAllocationValue().doubleValue(), 0.0000001);
 		testTotalValue(population, allocation);
 	}
 
-	private void testTotalValue(List<LSVMBidder> population, ItemSATSAllocation<LSVMLicense> allocation) {
+	private void testTotalValue(List<LSVMBidder> population, Allocation allocation) {
 		BigDecimal totalValue = new BigDecimal(0);
 
 		for (LSVMBidder bidder : population) {
-			Bundle<LSVMLicense> bundle = allocation.getAllocation(bidder);
+			Set<Good> goods = allocation.allocationOf(bidder).getGoods();
+			Bundle<LSVMLicense> bundle = new Bundle<>();
+			goods.forEach(g -> bundle.add((LSVMLicense) g)); // FIXME
 			totalValue = totalValue.add(bidder.calculateValue(bundle));
 		}
 
 		double delta = 0.0000001;
 		Assert.assertEquals("Values of allocated bundles don't match with objectie value of MIP ",
-				allocation.getTotalValue().doubleValue(), totalValue.doubleValue(), delta);
+				allocation.getTotalAllocationValue().doubleValue(), totalValue.doubleValue(), delta);
 	}
 
 	private List<LSVMBidder> customPopulation(LSVMWorld world, int numberOfRegionalBidders,

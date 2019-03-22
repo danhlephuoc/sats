@@ -132,4 +132,44 @@ public class VCGWithMockWorldTest {
 
     }
 
+    @Test
+    public void testORQVCG() {
+        Map<MockBand, Integer> bid1 = new HashMap<>();
+        bid1.put(B0, 1);
+        bid1.put(B1, 1);
+        bidder(1).addGenericBid(bid1, 2);
+
+        Map<MockBand, Integer> bid2 = new HashMap<>();
+        bid2.put(B0, 1);
+        bid2.put(B1, 1);
+        bid2.put(B2, 1);
+        bidder(2).addGenericBid(bid2, 3);
+
+        Map<MockBand, Integer> bid3 = new HashMap<>();
+        bid3.put(B1, 1);
+        bidder(3).addGenericBid(bid3, 1.5);
+
+        Map<MockBand, Integer> bid4 = new HashMap<>();
+        bid4.put(B0, 2);
+        bid4.put(B1, 2);
+        bid4.put(B2, 1);
+        bidder(4).addGenericBid(bid4, 4);
+
+        Bids bids = new Bids();
+        bids.setBid(bidder(1), bidder(1).getGenericBids());
+        bids.setBid(bidder(2), bidder(2).getGenericBids());
+        bids.setBid(bidder(3), bidder(3).getGenericBids());
+        bids.setBid(bidder(4), bidder(4).getGenericBids());
+
+        AuctionInstance auctionInstance = new AuctionInstance(bids);
+        ch.uzh.ifi.ce.mechanisms.AuctionMechanism am = new ORVCGAuction(auctionInstance);
+        ch.uzh.ifi.ce.domain.Payment payment = am.getPayment();
+        assertThat(payment.getTotalPayments().doubleValue()).isEqualTo(3.5);
+        assertThat(payment.paymentOf(bidder(1)).getAmount().doubleValue()).isEqualTo(1.5);
+        assertThat(payment.paymentOf(bidder(2)).getAmount().doubleValue()).isEqualTo(2);
+        assertThat(payment.paymentOf(bidder(3)).getAmount()).isZero();
+        assertThat(payment.paymentOf(bidder(4)).getAmount()).isZero();
+
+    }
+
 }

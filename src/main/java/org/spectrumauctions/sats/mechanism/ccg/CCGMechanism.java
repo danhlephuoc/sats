@@ -88,7 +88,7 @@ public class CCGMechanism<T extends SATSGood> implements AuctionMechanism<T> {
 
             double traitorPayoffs = 0;
             double traitorPayments = 0;
-            for (SATSBidder<T> bidder : blockingCoalition.getWinners()) {
+            for (SATSBidder<T> bidder : blockingCoalition.getWinnersOld()) {
                 traitorPayoffs += (originalAllocation.getTradeValue(bidder).doubleValue() - payment.paymentOf(bidder).getAmount());
                 traitorPayments += payment.paymentOf(bidder).getAmount();
             }
@@ -112,8 +112,8 @@ public class CCGMechanism<T extends SATSGood> implements AuctionMechanism<T> {
                 double coalitionValue = z_p - traitorPayments;
                 Constraint constraint = new Constraint(CompareType.GEQ, coalitionValue);
 
-                for (SATSBidder<T> nonTraitor : originalAllocation.getWinners()) {
-                    if (!blockingCoalition.getWinners().contains(nonTraitor)) {
+                for (SATSBidder<T> nonTraitor : originalAllocation.getWinnersOld()) {
+                    if (!blockingCoalition.getWinnersOld().contains(nonTraitor)) {
                         Variable paymentVariable = paymentVariables.get(nonTraitor);
                         constraint.addTerm(1, paymentVariable);
                     }
@@ -145,8 +145,8 @@ public class CCGMechanism<T extends SATSGood> implements AuctionMechanism<T> {
 
                 IMIPResult l2Result = solverClient.solve(l2Mip);
 
-                Map<SATSBidder<T>, BidderPayment> paymentMap = new HashMap<>(originalAllocation.getWinners().size());
-                for (SATSBidder<T> company : originalAllocation.getWinners()) {
+                Map<SATSBidder<T>, BidderPayment> paymentMap = new HashMap<>(originalAllocation.getWinnersOld().size());
+                for (SATSBidder<T> company : originalAllocation.getWinnersOld()) {
                     double doublePayment = l2Result.getValue(paymentVariables.get(company));
                     paymentMap.put(company, new BidderPayment(doublePayment));
                 }
@@ -157,16 +157,16 @@ public class CCGMechanism<T extends SATSGood> implements AuctionMechanism<T> {
     }
 
     private Map<SATSBidder<T>, Double> computePayoffs(SATSAllocation<T> allocation, Payment<T> payment) {
-        Map<SATSBidder<T>, Double> payoffs = new HashMap<>(allocation.getWinners().size());
-        for (SATSBidder<T> company : allocation.getWinners()) {
+        Map<SATSBidder<T>, Double> payoffs = new HashMap<>(allocation.getWinnersOld().size());
+        for (SATSBidder<T> company : allocation.getWinnersOld()) {
             payoffs.put(company, allocation.getTradeValue(company).doubleValue() - payment.paymentOf(company).getAmount());
         }
         return payoffs;
     }
 
     private Map<SATSBidder<T>, Variable> createPaymentVariables(SATSAllocation<T> originalAllocation, Payment<T> payment) {
-        Map<SATSBidder<T>, Variable> winnerVariables = new HashMap<>(originalAllocation.getWinners().size());
-        for (SATSBidder<T> winner : originalAllocation.getWinners()) {
+        Map<SATSBidder<T>, Variable> winnerVariables = new HashMap<>(originalAllocation.getWinnersOld().size());
+        for (SATSBidder<T> winner : originalAllocation.getWinnersOld()) {
 
             double winnerPayment = payment.paymentOf(winner).getAmount();
             double winnerValue = originalAllocation.getTradeValue(winner).doubleValue();

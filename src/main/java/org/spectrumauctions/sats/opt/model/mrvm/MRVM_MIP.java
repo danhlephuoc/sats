@@ -7,17 +7,16 @@ package org.spectrumauctions.sats.opt.model.mrvm;
 
 import ch.uzh.ifi.ce.domain.Bidder;
 import com.google.common.base.Preconditions;
-import edu.harvard.econcs.jopt.solver.IMIPResult;
-import edu.harvard.econcs.jopt.solver.SolveParam;
+import edu.harvard.econcs.jopt.solver.ISolution;
 import edu.harvard.econcs.jopt.solver.client.SolverClient;
-import edu.harvard.econcs.jopt.solver.mip.*;
+import edu.harvard.econcs.jopt.solver.mip.Constraint;
+import edu.harvard.econcs.jopt.solver.mip.MIP;
+import edu.harvard.econcs.jopt.solver.mip.Variable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValue;
-import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.mrvm.*;
 import org.spectrumauctions.sats.core.model.mrvm.MRVMRegionsMap.Region;
-import org.spectrumauctions.sats.opt.domain.WinnerDeterminator;
 import org.spectrumauctions.sats.opt.model.ModelMIP;
 
 import java.math.BigDecimal;
@@ -26,8 +25,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static edu.harvard.econcs.jopt.solver.mip.MIP.MAX_VALUE;
-
 /**
  * @author Michael Weiss
  *
@@ -35,7 +32,6 @@ import static edu.harvard.econcs.jopt.solver.mip.MIP.MAX_VALUE;
 public class MRVM_MIP extends ModelMIP {
 
     private static final Logger logger = LogManager.getLogger(MRVM_MIP.class);
-    private static final double DEFAULT_EPSILON = 0.00001;
 
     public static boolean PRINT_SOLVER_RESULT = false;
 
@@ -49,7 +45,6 @@ public class MRVM_MIP extends ModelMIP {
     private Map<MRVMBidder, MRVMBidderPartialMIP> bidderPartialMips;
     private MRVMWorld world;
     private Collection<MRVMBidder> bidders;
-    private double epsilon = DEFAULT_EPSILON;
 
     public MRVM_MIP(Collection<MRVMBidder> bidders) {
         Preconditions.checkNotNull(bidders);
@@ -106,16 +101,14 @@ public class MRVM_MIP extends ModelMIP {
      * @see EfficientAllocator#calculateEfficientAllocation()
      */
     @Override
-    public MRVMMipResult calculateAllocation() {
-        getMIP().setSolveParam(SolveParam.RELATIVE_OBJ_GAP, epsilon);
-        IMIPResult mipResult = SOLVER.solve(getMIP());
+    public MRVMMipResult adaptMIPResult(ISolution solution) {
         if (PRINT_SOLVER_RESULT) {
-            logger.info("Result:\n" + mipResult);
+            logger.info("Result:\n" + solution);
         }
-        MRVMMipResult.Builder resultBuilder = new MRVMMipResult.Builder(world, mipResult);
+        MRVMMipResult.Builder resultBuilder = new MRVMMipResult.Builder(world, solution);
         for (Map.Entry<MRVMBidder, MRVMBidderPartialMIP> bidder : bidderPartialMips.entrySet()) {
             Variable bidderValueVar = worldPartialMip.getValueVariable(bidder.getKey());
-            double mipUtilityResult = mipResult.getValue(bidderValueVar);
+            double mipUtilityResult = solution.getValue(bidderValueVar);
             double svScalingFactor = bidder.getValue().getScalingFactor();
 //            if (svScalingFactor != 1) {
 //                logger.info("Scaling SV Value with factor " + svScalingFactor);
@@ -125,14 +118,18 @@ public class MRVM_MIP extends ModelMIP {
             for (Region region : world.getRegionsMap().getRegions()) {
                 for (MRVMBand band : world.getBands()) {
                     Variable xVar = worldPartialMip.getXVariable(bidder.getKey(), region, band);
-                    double doubleQuantity = mipResult.getValue(xVar);
+                    double doubleQuantity = solution.getValue(xVar);
                     int quantity = (int) Math.round(doubleQuantity);
-                    MRVMGenericDefinition def = new MRVMGenericDefinition(band, region);
-                    valueBuilder.putQuantity(def, quantity);
+                    if (quantity > 0) {
+                        MRVMGenericDefinition def = new MRVMGenericDefinition(band, region);
+                        valueBuilder.putQuantity(def, quantity);
+                    }
                 }
             }
             GenericValue<MRVMGenericDefinition, MRVMLicense> build = valueBuilder.build();
-            resultBuilder.putGenericValue(bidder.getKey(), build);
+            if (!build.getQuantities().isEmpty()) {
+                resultBuilder.putGenericValue(bidder.getKey(), build);
+            }
         }
         return resultBuilder.build();
     }
@@ -175,10 +172,6 @@ public class MRVM_MIP extends ModelMIP {
             addConstraint(xConstraint2);
         }
     }*/
-
-    public void setEpsilon(double epsilon) {
-        this.epsilon = epsilon;
-    }
 
     public Collection<Variable> getXVariables() {
 

@@ -1,26 +1,27 @@
 package org.spectrumauctions.sats.opt.model.gsvm;
 
 import ch.uzh.ifi.ce.domain.Bidder;
-import ch.uzh.ifi.ce.domain.BidderAllocation;
+import ch.uzh.ifi.ce.mechanisms.MetaInfo;
 import com.google.common.base.Preconditions;
-import edu.harvard.econcs.jopt.solver.IMIPResult;
-import edu.harvard.econcs.jopt.solver.client.SolverClient;
+import edu.harvard.econcs.jopt.solver.ISolution;
 import edu.harvard.econcs.jopt.solver.mip.CompareType;
 import edu.harvard.econcs.jopt.solver.mip.Constraint;
 import edu.harvard.econcs.jopt.solver.mip.VarType;
 import edu.harvard.econcs.jopt.solver.mip.Variable;
-import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.Bundle;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.gsvm.GSVMBidder;
 import org.spectrumauctions.sats.core.model.gsvm.GSVMLicense;
 import org.spectrumauctions.sats.core.model.gsvm.GSVMWorld;
 import org.spectrumauctions.sats.opt.domain.ItemSATSAllocation;
 import org.spectrumauctions.sats.opt.domain.ItemSATSAllocation.ItemAllocationBuilder;
-import org.spectrumauctions.sats.opt.domain.WinnerDeterminator;
 import org.spectrumauctions.sats.opt.model.ModelMIP;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
 public class GSVMStandardMIP extends ModelMIP {
@@ -65,9 +66,7 @@ public class GSVMStandardMIP extends ModelMIP {
 	}
 
 	@Override
-	public ItemSATSAllocation<GSVMLicense> calculateAllocation() {
-		SolverClient solver = new SolverClient();
-		IMIPResult result = solver.solve(this.getMIP());
+	protected ItemSATSAllocation<GSVMLicense> adaptMIPResult(ISolution solution) {
 
 		Map<SATSBidder<GSVMLicense>, Bundle<GSVMLicense>> allocation = new HashMap<>();
 
@@ -76,7 +75,7 @@ public class GSVMStandardMIP extends ModelMIP {
             for (GSVMLicense license : world.getLicenses()) {
                 if (allowAssigningLicensesWithZeroBasevalue || valueMap.get(bidder).get(license) > 0) {
                     for (int tau = 0; tau < tauHatMap.get(bidder); tau++) {
-                        if (result.getValue(gMap.get(bidder).get(license).get(tau)) == 1) {
+                        if (solution.getValue(gMap.get(bidder).get(license).get(tau)) == 1) {
                             bundle.add(license);
                         }
                     }
@@ -85,8 +84,12 @@ public class GSVMStandardMIP extends ModelMIP {
             allocation.put(bidder, bundle);
         }
 
+		MetaInfo metaInfo = new MetaInfo();
+		metaInfo.setNumberOfMIPs(1);
+		metaInfo.setMipSolveTime(solution.getSolveTime());
+
 		ItemAllocationBuilder<GSVMLicense> builder = new ItemAllocationBuilder<GSVMLicense>().withWorld(world)
-				.withTotalValue(BigDecimal.valueOf(result.getObjectiveValue())).withAllocation(allocation);
+				.withTotalValue(BigDecimal.valueOf(solution.getObjectiveValue())).withAllocation(allocation).withMetaInfo(metaInfo);
 
 		return builder.build();
 	}

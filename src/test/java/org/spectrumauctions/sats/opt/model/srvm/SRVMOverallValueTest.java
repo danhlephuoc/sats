@@ -27,7 +27,7 @@ public class SRVMOverallValueTest {
     public void mipValuesEqualSATSValues() {
         List<SRVMBidder> bidders = new SingleRegionModel().createNewPopulation();
         SRVM_MIP mip = new SRVM_MIP(bidders);
-        SRVMMipResult result = mip.calculateAllocation();
+        SRVMMipResult result = (SRVMMipResult) mip.getAllocation(); // FIXME
         for (SRVMBidder bidder : bidders) {
             GenericValue<SRVMBand, SRVMLicense> outcomeVal = result.getGenericAllocation(bidder);
             BigDecimal satsVal = bidder.calculateValue(outcomeVal.getQuantities());

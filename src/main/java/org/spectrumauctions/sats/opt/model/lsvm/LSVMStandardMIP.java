@@ -3,15 +3,14 @@ package org.spectrumauctions.sats.opt.model.lsvm;
 import ch.uzh.ifi.ce.domain.Bidder;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import edu.harvard.econcs.jopt.solver.IMIPResult;
+import edu.harvard.econcs.jopt.solver.ISolution;
 import edu.harvard.econcs.jopt.solver.SolveParam;
-import edu.harvard.econcs.jopt.solver.client.SolverClient;
 import edu.harvard.econcs.jopt.solver.mip.CompareType;
 import edu.harvard.econcs.jopt.solver.mip.Constraint;
 import edu.harvard.econcs.jopt.solver.mip.VarType;
 import edu.harvard.econcs.jopt.solver.mip.Variable;
-import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.Bundle;
+import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.cats.graphalgorithms.Vertex;
 import org.spectrumauctions.sats.core.model.lsvm.LSVMBidder;
 import org.spectrumauctions.sats.core.model.lsvm.LSVMGrid;
@@ -19,7 +18,6 @@ import org.spectrumauctions.sats.core.model.lsvm.LSVMLicense;
 import org.spectrumauctions.sats.core.model.lsvm.LSVMWorld;
 import org.spectrumauctions.sats.opt.domain.ItemSATSAllocation;
 import org.spectrumauctions.sats.opt.domain.ItemSATSAllocation.ItemAllocationBuilder;
-import org.spectrumauctions.sats.opt.domain.WinnerDeterminator;
 import org.spectrumauctions.sats.opt.model.ModelMIP;
 
 import java.math.BigDecimal;
@@ -78,16 +76,13 @@ public class LSVMStandardMIP extends ModelMIP {
 	}
 
 	@Override
-	public ItemSATSAllocation<LSVMLicense> calculateAllocation() {
-		SolverClient solver = new SolverClient();
-		IMIPResult result = solver.solve(getMIP());
-
+	public ItemSATSAllocation<LSVMLicense> adaptMIPResult(ISolution solution) {
 		Map<SATSBidder<LSVMLicense>, Bundle<LSVMLicense>> allocation = new HashMap<>();
 		for (LSVMBidder bidder : population) {
 			Bundle<LSVMLicense> bundle = new Bundle<>();
             for (LSVMLicense license : world.getLicenses()) {
                 for (int tau = 0; tau < world.getLicenses().size(); tau++) {
-                    if (result.getValue(aVariables.get(bidder).get(license).get(tau)) > 0) {
+                    if (solution.getValue(aVariables.get(bidder).get(license).get(tau)) > 0) {
                         bundle.add(license);
                     }
                 }
@@ -96,7 +91,7 @@ public class LSVMStandardMIP extends ModelMIP {
 		}
 
 		ItemAllocationBuilder<LSVMLicense> builder = new ItemAllocationBuilder<LSVMLicense>().withWorld(world)
-				.withTotalValue(BigDecimal.valueOf(result.getObjectiveValue())).withAllocation(allocation);
+				.withTotalValue(BigDecimal.valueOf(solution.getObjectiveValue())).withAllocation(allocation);
 
 		return builder.build();
 	}

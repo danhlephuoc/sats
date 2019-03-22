@@ -1,5 +1,7 @@
 package org.spectrumauctions.sats.opt.examples;
 
+import ch.uzh.ifi.ce.domain.Allocation;
+import ch.uzh.ifi.ce.mechanisms.winnerdetermination.WinnerDetermination;
 import com.google.common.collect.ImmutableMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,6 +25,7 @@ import java.util.Collection;
  *
  * @author Fabio Isler
  */
+// FIXME: Clean up usage once design is clear
 public class CustomizedExamples {
 
     private static final Logger logger = LogManager.getLogger(CustomizedExamples.class);
@@ -39,8 +42,8 @@ public class CustomizedExamples {
         model.setNumberOfRegionalBidders(2);
 
         Collection<MRVMBidder> bidders = model.createNewPopulation();   // Create bidders
-        MRVM_MIP mip = new MRVM_MIP(bidders);                           // Create the MIP
-        MRVMMipResult result = mip.calculateAllocation();               // Solve the MIP
+        WinnerDetermination mip = new MRVM_MIP(bidders);                // Create the MIP
+        MRVMMipResult result = (MRVMMipResult) mip.getAllocation();     // Solve the MIP
         logger.info("Result:\n" + result);                           // Show the allocation
     }
 
@@ -84,9 +87,9 @@ public class CustomizedExamples {
                 new MRVMNationalBidderSetup.Builder().build(),
                 new JavaUtilRNGSupplier()
         );
-        MRVM_MIP mip = new MRVM_MIP(bidders);                           // Create the MIP
-        MRVMMipResult result = mip.calculateAllocation();               // Solve the MIP
-        logger.info("Result:\n" + result);                                            // Show the allocation
+        WinnerDetermination mip = new MRVM_MIP(bidders);                            // Create the MIP
+        MRVMMipResult result = (MRVMMipResult) mip.getAllocation();                                    // Solve the MIP
+        logger.info("Result:\n" + result);                                           // Show the allocation
     }
 
     /**
@@ -116,9 +119,9 @@ public class CustomizedExamples {
                 new JavaUtilRNGSupplier()
         );
 
-        MRVM_MIP mip = new MRVM_MIP(bidders);                           // Create the MIP
-        MRVMMipResult result = mip.calculateAllocation();               // Solve the MIP
-        logger.info("Result:\n" + result);                                            // Show the allocation
+        WinnerDetermination mip = new MRVM_MIP(bidders);                           // Create the MIP
+        Allocation result = mip.getAllocation();                                   // Solve the MIP
+        logger.info("Result:\n" + result);                                      // Show the allocation
     }
 
 }

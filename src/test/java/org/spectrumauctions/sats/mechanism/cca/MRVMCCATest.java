@@ -8,7 +8,10 @@ import org.junit.Test;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericBid;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValue;
 import org.spectrumauctions.sats.core.model.SATSBidder;
-import org.spectrumauctions.sats.core.model.mrvm.*;
+import org.spectrumauctions.sats.core.model.mrvm.MRVMBidder;
+import org.spectrumauctions.sats.core.model.mrvm.MRVMGenericDefinition;
+import org.spectrumauctions.sats.core.model.mrvm.MRVMLicense;
+import org.spectrumauctions.sats.core.model.mrvm.MultiRegionModel;
 import org.spectrumauctions.sats.mechanism.PaymentRuleEnum;
 import org.spectrumauctions.sats.mechanism.cca.priceupdate.DemandDependentGenericPriceUpdate;
 import org.spectrumauctions.sats.mechanism.cca.priceupdate.SimpleRelativeGenericPriceUpdate;
@@ -22,12 +25,10 @@ import org.spectrumauctions.sats.opt.model.mrvm.demandquery.MRVM_DemandQueryMIPB
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class MRVMCCATest {
 
@@ -48,7 +49,7 @@ public class MRVMCCATest {
         List<MRVMBidder> rawBidders = new MultiRegionModel().createNewPopulation();
         MRVM_MIP mip = new MRVM_MIP(Sets.newHashSet(rawBidders));
         mip.setEpsilon(1e-5);
-        MRVMMipResult efficientAllocation = mip.calculateAllocation();
+        MRVMMipResult efficientAllocation = (MRVMMipResult) mip.calculateAllocation();
         SATSAllocation<MRVMLicense> efficientAllocationWithTrueValues = efficientAllocation.getAllocationWithTrueValues();
         double diff = efficientAllocation.getTotalValue().doubleValue() - efficientAllocationWithTrueValues.getTotalValue().doubleValue();
         //assertTrue(diff > -1e-6 && diff < 1e-6);

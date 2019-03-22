@@ -5,7 +5,7 @@
  */
 package org.spectrumauctions.sats.opt.model.mrvm;
 
-import edu.harvard.econcs.jopt.solver.IMIPResult;
+import edu.harvard.econcs.jopt.solver.ISolution;
 import org.spectrumauctions.sats.core.bidlang.generic.GenericValue;
 import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.mrvm.*;
@@ -26,7 +26,7 @@ public final class MRVMMipResult extends GenericSATSAllocation<MRVMGenericDefini
 
     private final MRVMWorld world;
 
-    private final IMIPResult joptResult;
+    private final ISolution joptResult;
 
     private MRVMMipResult(Builder builder) {
         super(builder);
@@ -34,7 +34,7 @@ public final class MRVMMipResult extends GenericSATSAllocation<MRVMGenericDefini
         this.joptResult = builder.joptResult;
     }
 
-    public IMIPResult getJoptResult() {
+    public ISolution getJoptResult() {
         return joptResult;
     }
 
@@ -121,14 +121,14 @@ public final class MRVMMipResult extends GenericSATSAllocation<MRVMGenericDefini
 
 
         private MRVMWorld world;
-        private final IMIPResult joptResult;
+        private final ISolution joptResult;
 
         /**
          *
          * @param world
          * @param joptResult The result object //TODO Use Result object here in construction to build MRVMMipResult
          */
-        public Builder(MRVMWorld world, IMIPResult joptResult) {
+        public Builder(MRVMWorld world, ISolution joptResult) {
             super();
             this.world = world;
             this.joptResult = joptResult;

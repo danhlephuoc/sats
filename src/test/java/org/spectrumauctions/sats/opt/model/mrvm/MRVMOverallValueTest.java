@@ -5,7 +5,7 @@
  */
 package org.spectrumauctions.sats.opt.model.mrvm;
 
-import edu.harvard.econcs.jopt.solver.IMIPResult;
+import edu.harvard.econcs.jopt.solver.ISolution;
 import edu.harvard.econcs.jopt.solver.mip.Variable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,10 +40,10 @@ public class MRVMOverallValueTest {
     @Ignore // Ignored for performance reasons
     public void mipValuesEqualSATSValues() {
         List<MRVMBidder> bidders = new MultiRegionModel().createNewPopulation();
-        //Sort by bidder type
+        // Sort by bidder type
         bidders.sort(Comparator.comparing(b -> b.getClass().getSimpleName()));
         MRVM_MIP mip = new MRVM_MIP(bidders);
-        MRVMMipResult result = mip.calculateAllocation();
+        MRVMMipResult result = (MRVMMipResult) mip.getAllocation(); // FIXME
         List<String> errors;
         errors = assertAllocatonTransformationAndCapCalculation(result, result.getJoptResult(), bidders, mip);
         failIfFailed(errors);
@@ -59,7 +59,7 @@ public class MRVMOverallValueTest {
         failIfFailed(errors);
     }
 
-    private List<String> assertAllocatonTransformationAndCapCalculation(MRVMMipResult result, IMIPResult imipResult, List<MRVMBidder> bidders, MRVM_MIP mrvm_mip) {
+    private List<String> assertAllocatonTransformationAndCapCalculation(MRVMMipResult result, ISolution imipResult, List<MRVMBidder> bidders, MRVM_MIP mrvm_mip) {
         List<String> assertionResults = new ArrayList<>();
         for (MRVMBidder bidder : bidders) {
             GenericValue<MRVMGenericDefinition, MRVMLicense> val = result.getGenericAllocation(bidder);
@@ -90,7 +90,7 @@ public class MRVMOverallValueTest {
     }
 
 
-    private List<String> assertCValues(MRVMMipResult result, IMIPResult imipResult, List<MRVMBidder> bidders, MRVM_MIP mrvm_mip) {
+    private List<String> assertCValues(MRVMMipResult result, ISolution imipResult, List<MRVMBidder> bidders, MRVM_MIP mrvm_mip) {
         List<String> assertionResults = new ArrayList<>();
         for (MRVMBidder bidder : bidders) {
             GenericValue<MRVMGenericDefinition, MRVMLicense> val = result.getGenericAllocation(bidder);
@@ -105,7 +105,7 @@ public class MRVMOverallValueTest {
         return assertionResults;
     }
 
-    private List<String> assertSubscriberValues(MRVMMipResult result, IMIPResult imipResult, List<MRVMBidder> bidders, MRVM_MIP mrvm_mip) {
+    private List<String> assertSubscriberValues(MRVMMipResult result, ISolution imipResult, List<MRVMBidder> bidders, MRVM_MIP mrvm_mip) {
         List<String> assertionResults = new ArrayList<>();
         for (MRVMBidder bidder : bidders) {
             GenericValue<MRVMGenericDefinition, MRVMLicense> val = result.getGenericAllocation(bidder);
@@ -122,7 +122,7 @@ public class MRVMOverallValueTest {
         return assertionResults;
     }
 
-    private List<String> assertOmegaValues(MRVMMipResult result, IMIPResult imipResult, List<MRVMBidder> bidders, MRVM_MIP mrvm_mip) {
+    private List<String> assertOmegaValues(MRVMMipResult result, ISolution imipResult, List<MRVMBidder> bidders, MRVM_MIP mrvm_mip) {
         List<String> assertionResults = new ArrayList<>();
         for (MRVMBidder bidder : bidders) {
             GenericValue<MRVMGenericDefinition, MRVMLicense> val = result.getGenericAllocation(bidder);
@@ -144,7 +144,7 @@ public class MRVMOverallValueTest {
         return assertionResults;
     }
 
-    private List<String> assertGammaFactorsValue(MRVMMipResult result, IMIPResult joptResult, List<MRVMBidder> bidders, MRVM_MIP mip) {
+    private List<String> assertGammaFactorsValue(MRVMMipResult result, ISolution joptResult, List<MRVMBidder> bidders, MRVM_MIP mip) {
         List<String> assertionResults = new ArrayList<>();
         for (MRVMBidder bidder : bidders) {
             if (MRVMLocalBidder.class.isAssignableFrom(bidder.getClass())) {
@@ -161,7 +161,7 @@ public class MRVMOverallValueTest {
         return assertionResults;
     }
 
-    private List<String> assertLocalValueAndThusGammaFactors(MRVMMipResult result, IMIPResult joptResult, MRVMBidder bidder, MRVM_MIP mip) {
+    private List<String> assertLocalValueAndThusGammaFactors(MRVMMipResult result, ISolution joptResult, MRVMBidder bidder, MRVM_MIP mip) {
         List<String> assertionResults = new ArrayList<>();
         MRVMLocalBidderPartialMip localBidderPartialMip = (MRVMLocalBidderPartialMip) mip.getBidderPartialMips().get(bidder);
         //There is no gamma variable, thus we check if the sum is made correctly
@@ -196,7 +196,7 @@ public class MRVMOverallValueTest {
      * @param mip
      * @return
      */
-    private List<String> assertRegionalGammaFactorsValue(MRVMMipResult result, IMIPResult joptResult, MRVMBidder bidder, MRVM_MIP mip) {
+    private List<String> assertRegionalGammaFactorsValue(MRVMMipResult result, ISolution joptResult, MRVMBidder bidder, MRVM_MIP mip) {
         List<String> assertionResults = new ArrayList<>();
         //There is no gamma variable, thus we only check if sats-core impl is consistent with was mip is supposed to do
         BigDecimal manualOmegaSum = BigDecimal.ZERO;
@@ -213,14 +213,14 @@ public class MRVMOverallValueTest {
     }
 
 
-    private List<String> assertNationalGammaFactorsValue(MRVMMipResult result, IMIPResult joptResult, MRVMBidder bidders, MRVM_MIP mip) {
+    private List<String> assertNationalGammaFactorsValue(MRVMMipResult result, ISolution joptResult, MRVMBidder bidders, MRVM_MIP mip) {
         List<String> assertionResults = new ArrayList<>();
         //TODO
         return assertionResults;
     }
 
 
-    private List<String> assertOverallValue(MRVMMipResult result, IMIPResult joptResult, List<MRVMBidder> bidders, MRVM_MIP mip) {
+    private List<String> assertOverallValue(MRVMMipResult result, ISolution joptResult, List<MRVMBidder> bidders, MRVM_MIP mip) {
         List<String> assertionResults = new ArrayList<>();
         for (MRVMBidder bidder : bidders) {
             GenericValue<MRVMGenericDefinition, MRVMLicense> outcomeVal = result.getGenericAllocation(bidder);

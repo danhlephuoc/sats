@@ -8,6 +8,7 @@ package org.spectrumauctions.sats.opt.domain;
 import org.spectrumauctions.sats.core.model.SATSBidder;
 import org.spectrumauctions.sats.core.model.Bundle;
 import org.spectrumauctions.sats.core.model.SATSGood;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -19,7 +20,9 @@ import java.util.Collection;
 // TODO: Align with mechanism library's Allocation
 public interface SATSAllocation<T extends SATSGood> {
 
-    Collection<SATSBidder<T>> getWinners();
+    default Collection<SATSBidder<T>> getWinnersOld() {
+        throw new NotImplementedException();
+    }
 
     /**
      * Returns information about the goods allocated to a specific bidder
